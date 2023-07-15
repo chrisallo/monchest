@@ -7,7 +7,7 @@
   "license": "MIT",
   "module": "true",
   "scripts": {
-    "build": "yarn run rollup -c",
+    "build": "rm -rf ./dist && yarn run rollup -c",
     "test": "jest"
   },
   "devDependencies": {
@@ -22,6 +22,7 @@
     "jest": "^29.6.1",
     "rollup": "^3.26.2",
     "tslib": "^2.6.0",
+    "typedoc": "^0.24.8",
     "typescript": "^5.1.6"
   }
 }

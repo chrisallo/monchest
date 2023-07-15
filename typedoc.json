@@ -1,0 +1,24 @@
+{
+  "name": "Glacier SDK Reference",
+  "entryPoints": [
+    "src/glacier.ts",
+  ],
+  "exclude": [
+    "node_modules/**/*",
+    "dist/**/*.(ts|js)",
+    "test/**/*.ts"
+  ],
+  "out": "docs",
+  "sort": [
+    "static-first",
+    "visibility",
+    "source-order"
+  ],
+  "readme": "REFERENCE.md",
+  "includeVersion": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeExternals": true,
+  "excludeInternal": true,
+  "disableSources": true
+}

@@ -2,19 +2,40 @@
 import { warning } from '../utils/logger'
 
 export interface GLEncryptionPolicy {
+  /**
+   * @describe
+   *  The function to encrypt an object to an encrypted string.
+   */
   encrypt: (data: object) => string
+
+  /**
+   * @describe
+   *  The function to decrypt an encrypted string to the original data.
+   */
   decrypt: (encrypted: string) => object
 }
+
+/**
+ * @internal
+ */
 export interface GLStorageDriverProps {
   name: string
   maxRawSize?: number
   encryptionPolicy?: GLEncryptionPolicy
 }
+
+/**
+ * @internal
+ */
 export interface GLStorageData {
   key: string
   value: object
 }
-export interface GLStorageDataShard {
+
+/**
+ * @internal
+ */
+interface GLStorageDataShard {
   key: string
   value: string
   numberOfShards?: number
