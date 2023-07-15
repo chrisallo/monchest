@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "types": [ "jest", "node" ],
+    "module": "es2020",
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "resolveJsonModule": true,
+    "downlevelIteration": true,
+    "allowSyntheticDefaultImports": true,
+    "noImplicitOverride": true,
+    "rootDir": ".",
+    "outDir": "dist",
+    "strictNullChecks": true,
+    "declaration": true,
+    "skipLibCheck": true,
+  },
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules/**/*",
+    "scripts/**/*",
+    "dist/**/*"
+  ]
+}
