@@ -18,7 +18,7 @@ export interface GLEncryptionPolicy {
 /**
  * @internal
  */
-export interface GLStorageDriverProps {
+export interface GLStorageProps {
   name: string
   maxRawSize?: number
   encryptionPolicy?: GLEncryptionPolicy
@@ -49,7 +49,7 @@ const ENCRYPTION_CHECK_DUMMY = { a: 100, n: 'stacktrace' }
 const DEFAULT_MAX_RAW_SIZE = 4096
 const MINIMUM_MAX_RAW_SIZE = 10
 
-export default abstract class GLStorageDriver {
+export default abstract class GLStorage {
   readonly name: string
   readonly encryptionPolicy: GLEncryptionPolicy
   protected readonly maxRawSize: number
@@ -113,7 +113,7 @@ export default abstract class GLStorageDriver {
       })
   }
   
-  constructor(props: GLStorageDriverProps) {
+  constructor(props: GLStorageProps) {
     const {
       name,
       maxRawSize,

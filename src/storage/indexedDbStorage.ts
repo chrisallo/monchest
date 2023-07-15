@@ -1,5 +1,5 @@
 
-import GLStorageDriver, { GLStorageData, GLStorageDriverProps } from './storageDriver'
+import GLStorage, { GLStorageData, GLStorageProps } from '.'
 import GLError from '../error'
 import { isBrowser, isLegacyEdgeBrowser } from '../utils/compat'
 
@@ -32,16 +32,16 @@ const INDEXEDDB_OBJECTSTORE_NAME = 'Glacier'
 const INDEXEDDB_ITEM_SIZE_LIMIT = 100 * 1024 * 1024 // 100MB
 const INDEXEDDB_REOPEN_DELAY = 10
 
-export interface GLIndexedDbStorageDriverProps extends GLStorageDriverProps {}
+export interface GLIndexedDbStorageProps extends GLStorageProps {}
 
-export default class GLIndexedDbStorageDriver extends GLStorageDriver {
+export default class GLIndexedDbStorage extends GLStorage {
   private state: IndexedDbStorageState
   private window?: WindowCompat
   private indexedDb?: IDBFactory
   private database?: IDBDatabase
   private openJobQueue: IndexedDbOpenJob[] = []
 
-  constructor(props: GLIndexedDbStorageDriverProps) {
+  constructor(props: GLIndexedDbStorageProps) {
     super({
       ...props,
       maxRawSize: INDEXEDDB_ITEM_SIZE_LIMIT,

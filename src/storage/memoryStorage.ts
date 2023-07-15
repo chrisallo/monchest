@@ -1,8 +1,8 @@
 
-import GLStorageDriver, { GLStorageData, GLStorageDriverProps } from './storageDriver'
+import GLStorage, { GLStorageData, GLStorageProps } from '.'
 import { sleep } from '../utils/sleep'
 
-export interface GLMemoryStorageDriverProps extends GLStorageDriverProps {
+export interface GLMemoryStorageProps extends GLStorageProps {
   readDelay?: number
   writeDelay?: number
 }
@@ -11,14 +11,14 @@ const MEMORY_ITEM_SIZE_LIMIT = 10 * 1024 * 1024 // 10MB
 const DEFAULT_MEMORY_STORAGE_READ_DELAY = 0
 const DEFAULT_MEMORY_STORAGE_WRITE_DELAY = 1
 
-export default class GLMemoryStorageDriver extends GLStorageDriver {
+export default class GLMemoryStorage extends GLStorage {
   private store: Record<string, object>
   private delay: {
     read: number
     write: number
   }
 
-  constructor(props: GLMemoryStorageDriverProps) {
+  constructor(props: GLMemoryStorageProps) {
     super({
       ...props,
       maxRawSize: MEMORY_ITEM_SIZE_LIMIT,

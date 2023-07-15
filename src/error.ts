@@ -76,7 +76,7 @@ export default class GLError extends Error {
   static get debuggingModeRequired(): GLError {
     return new GLError({
       code: GLErrorCode.DEBUGGING_MODE_REQUIRED,
-      message: 'Debugging mode is required. Use GLMemoryStorageDriver to enable the debugging mode.',
+      message: 'Debugging mode is required. Use GLMemoryStorage to enable the debugging mode.',
     })
   }
 }
