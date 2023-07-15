@@ -8,6 +8,7 @@
   "module": "true",
   "scripts": {
     "build": "rm -rf ./dist && yarn run rollup -c",
+    "docs": "typedoc",
     "test": "jest"
   },
   "devDependencies": {
