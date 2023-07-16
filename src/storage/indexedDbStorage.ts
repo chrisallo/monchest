@@ -1,5 +1,5 @@
 
-import GLStorage, { GLStorageData, GLStorageProps } from '.'
+import GLStorage, { type GLStorageData, type GLStorageProps } from '.'
 import GLError from '../error'
 import { isBrowser, isLegacyEdgeBrowser } from '../utils/compat'
 
@@ -64,7 +64,7 @@ export default class GLIndexedDbStorage extends GLStorage {
         openDBRequest.addEventListener('success', (ev: IDBOpenDBRequestEvent) => {
           this.state = IndexedDbStorageState.OPEN
           this.database = ev.target.result
-          
+
           this.openJobQueue.forEach((job: IndexedDbOpenJob) => job())
           this.openJobQueue = []
 
@@ -98,7 +98,7 @@ export default class GLIndexedDbStorage extends GLStorage {
 
         case IndexedDbStorageState.OPENING:
         case IndexedDbStorageState.CLOSED:
-          return new Promise((resolve) => {
+          return await new Promise((resolve) => {
             this.openJobQueue.push(() => resolve(this.getObjectStore(access)))
           })
       }
@@ -168,16 +168,16 @@ export default class GLIndexedDbStorage extends GLStorage {
         return new Promise((resolve, reject) => {
           const request: IDBRequest = objectStore.put(item)
           request.addEventListener('success', (ev: IDBPutRequestEvent) => resolve())
-          request.addEventListener('error', () => reject('Failed to write.'))
+          request.addEventListener('error', () => reject(new Error('Failed to write.')))
         })
       }),
     )
   }
   protected async removeRaw(keys: string[]): Promise<void> {
-    const objectStore = await this.getObjectStore('readwrite');
+    const objectStore = await this.getObjectStore('readwrite')
     await Promise.all<string>(keys.map((key: string) => {
       return new Promise((resolve, reject) => {
-        const request: IDBRequest = objectStore.delete(key);
+        const request: IDBRequest = objectStore.delete(key)
         request.addEventListener('success', (/* ev: IDBRemoveRequestEvent */) => resolve(key))
         request.addEventListener('error', (ev: IDBGetRequestEvent) => reject(ev.target.error))
       })

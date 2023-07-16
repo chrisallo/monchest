@@ -1,5 +1,5 @@
 
-import GLStorage, { GLStorageData, GLStorageProps } from '.'
+import GLStorage, { type GLStorageData, type GLStorageProps } from '.'
 import { sleep } from '../utils/sleep'
 
 export interface GLMemoryStorageProps extends GLStorageProps {
@@ -12,8 +12,8 @@ const DEFAULT_MEMORY_STORAGE_READ_DELAY = 0
 const DEFAULT_MEMORY_STORAGE_WRITE_DELAY = 1
 
 export default class GLMemoryStorage extends GLStorage {
-  private store: Record<string, object>
-  private delay: {
+  private store: object
+  private readonly delay: {
     read: number
     write: number
   }
@@ -29,7 +29,7 @@ export default class GLMemoryStorage extends GLStorage {
       write: props.writeDelay ?? DEFAULT_MEMORY_STORAGE_WRITE_DELAY,
     }
   }
-  get rawData(): Record<string, object> {
+  get rawData(): object {
     return this.store
   }
   async init(): Promise<void> {
@@ -45,11 +45,11 @@ export default class GLMemoryStorage extends GLStorage {
   }
   protected async getRaw(key: string): Promise<object | null> {
     await sleep(this.delay.read)
-    return this.store[key] || null
+    return this.store[key] ?? null
   }
   protected async setRaw(items: GLStorageData[]): Promise<void> {
     await sleep(this.delay.write)
-    items.map((item: GLStorageData) => {
+    items.forEach((item: GLStorageData): void => {
       this.store[item.key] = item.value
     })
   }

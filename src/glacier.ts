@@ -66,12 +66,12 @@ class Glacier {
 
   private readonly encryptionPolicy?: GLEncryptionPolicy
   private readonly debugMode: boolean
-  
+
   private driver: GLStorage
   private driverInitialized: boolean
-  
+
   constructor(props: GlacierProps) {
-    let {
+    const {
       name,
       debugMode = false,
       driver = GLStorageType.Memory,
@@ -129,7 +129,7 @@ class Glacier {
    *  (Debug mode only) Returns all the data in storage as an object.
    *  It throws an error if the `debugMode` is off.
    */
-  getMemoryStoreForDebugging(): Record<string, object> {
+  getMemoryStoreForDebugging(): object {
     if (this.debugMode) {
       if (this.driver instanceof GLMemoryStorage) {
         return this.driver.rawData
@@ -210,7 +210,7 @@ class Glacier {
    */
   async remove(key: string): Promise<boolean> {
     await this.guaranteeStorageInitialized()
-    return this.driver?.remove(key)
+    return await this.driver?.remove(key)
   }
 
   /**

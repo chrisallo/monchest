@@ -70,19 +70,16 @@ export default abstract class GLStorage {
 
   protected async resetIfEncryptionChanged(): Promise<void> {
     const encryptCheckKey = `${this.name}.encryptcheck`
-    const previousEncrypted = await this.get(encryptCheckKey)
+    const previousEncrypted = await this.get(encryptCheckKey) as { encrypted: string } | null
     const currentEncrypted = {
       encrypted: this.encryptionPolicy.encrypt(ENCRYPTION_CHECK_DUMMY)
     }
-    if (previousEncrypted && previousEncrypted['encrypted'] && Array.isArray(previousEncrypted['encrypted'])) {
-      for (const i in previousEncrypted['encrypted']) {
-        const previousStringifiedEncryptedSeed = JSON.stringify(previousEncrypted['encrypted'][i])
-        const currentStringifiedEncryptedSeed = JSON.stringify(currentEncrypted.encrypted[i])
-        if (previousStringifiedEncryptedSeed !== currentStringifiedEncryptedSeed) {
-          warning('Encryption algorithm has changed. Stored data would be cleared.')
-          await this.clear()
-          break
-        }
+    if (previousEncrypted) {
+      const previousStringifiedEncryptedSeed = previousEncrypted.encrypted
+      const currentStringifiedEncryptedSeed = currentEncrypted.encrypted
+      if (previousStringifiedEncryptedSeed !== currentStringifiedEncryptedSeed) {
+        warning('Encryption algorithm has changed. Stored data would be cleared.')
+        await this.clear()
       }
     }
     await this.set(encryptCheckKey, currentEncrypted)
@@ -112,7 +109,7 @@ export default abstract class GLStorage {
         return shard
       })
   }
-  
+
   constructor(props: GLStorageProps) {
     const {
       name,
@@ -136,8 +133,8 @@ export default abstract class GLStorage {
     if (rawData) {
       try {
         const { value, numberOfShards } = rawData as GLStorageDataShard
-        const shards = numberOfShards && numberOfShards > 1 ?
-          await Promise.all(
+        const shards = numberOfShards && numberOfShards > 1
+          ? await Promise.all(
             this.generateShardPostfixArray(numberOfShards)
               .map(async (index: number) => {
                 if (index > 0) {
@@ -146,8 +143,8 @@ export default abstract class GLStorage {
                   return rawData?.value
                 } else return value
               }),
-          ) :
-          [value]
+          )
+          : [value]
         return this.encryptionPolicy.decrypt(JSON.parse(shards.join('')))
       } catch (err) {
         return null
@@ -194,10 +191,8 @@ export default abstract class GLStorage {
       const rawData = await this.getRaw(rawKey)
       if (rawData) {
         const { numberOfShards } = rawData as GLStorageDataShard
-        rawKeys.push(...
-          this.generateShardPostfixArray(numberOfShards)
-            .map((index: number) => this.createRawKey(key, index)),
-        )
+        rawKeys.push(...this.generateShardPostfixArray(numberOfShards)
+          .map((index: number) => this.createRawKey(key, index)))
       }
     }
     if (rawKeys.length > 0) {
