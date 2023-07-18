@@ -7,11 +7,13 @@ import terser from '@rollup/plugin-terser'
 export default {
   input: 'src/barnet.ts',
   output: {
-    dir: '.',
+    dir: 'dist',
     format: 'esm'
   },
   plugins: [
-    typescript(),
+    typescript({
+      filterRoot: 'src'
+    }),
     nodeResolve(),
     commonjs(),
     terser(),

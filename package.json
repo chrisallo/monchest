@@ -1,7 +1,8 @@
 {
   "name": "barnet",
   "version": "0.9.0",
-  "main": "barnet.js",
+  "main": "./dist/barnet.js",
+  "types": "./dist/src/barnet.d.ts",
   "repository": "https://github.com/chrisallo/barnet.git",
   "author": "chrisallo <chrisallo.h@gmail.com>",
   "license": "GPL-3.0-or-later",
