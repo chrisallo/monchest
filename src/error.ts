@@ -1,5 +1,5 @@
 
-export enum BNErrorCode {
+export enum BarnetErrorCode {
   /**
    * @describe The environment does not support the storage type.
    */
@@ -24,18 +24,18 @@ export enum BNErrorCode {
 /**
  * @internal
  */
-interface BNErrorProps {
-  code: BNErrorCode
+interface BarnetErrorProps {
+  code: BarnetErrorCode
   message: string
 }
 
-export default class BNError extends Error {
-  readonly code: BNErrorCode
+export default class BarnetError extends Error {
+  readonly code: BarnetErrorCode
 
   /**
    * @private
    */
-  constructor(props: BNErrorProps) {
+  constructor(props: BarnetErrorProps) {
     super(props.message)
     this.code = props.code
   }
@@ -43,9 +43,9 @@ export default class BNError extends Error {
   /**
    * @internal
    */
-  static get storageNotAvailable(): BNError {
-    return new BNError({
-      code: BNErrorCode.STORAGE_NOT_AVAILABLE,
+  static get storageNotAvailable(): BarnetError {
+    return new BarnetError({
+      code: BarnetErrorCode.STORAGE_NOT_AVAILABLE,
       message: 'Storage not available.',
     })
   }
@@ -53,9 +53,9 @@ export default class BNError extends Error {
   /**
    * @internal
    */
-  static get storeNotInitialized(): BNError {
-    return new BNError({
-      code: BNErrorCode.STORAGE_NOT_AVAILABLE,
+  static get storeNotInitialized(): BarnetError {
+    return new BarnetError({
+      code: BarnetErrorCode.STORAGE_NOT_AVAILABLE,
       message: 'Storage is not initialized.',
     })
   }
@@ -63,9 +63,9 @@ export default class BNError extends Error {
   /**
    * @internal
    */
-  static get dataEncodingFailed(): BNError {
-    return new BNError({
-      code: BNErrorCode.DATA_ENCODING_FAILED,
+  static get dataEncodingFailed(): BarnetError {
+    return new BarnetError({
+      code: BarnetErrorCode.DATA_ENCODING_FAILED,
       message: 'Failed to read data from Blob.',
     })
   }
@@ -73,10 +73,10 @@ export default class BNError extends Error {
   /**
    * @internal
    */
-  static get debuggingModeRequired(): BNError {
-    return new BNError({
-      code: BNErrorCode.DEBUGGING_MODE_REQUIRED,
-      message: 'Debugging mode is required. Use BNMemoryStorage to enable the debugging mode.',
+  static get debuggingModeRequired(): BarnetError {
+    return new BarnetError({
+      code: BarnetErrorCode.DEBUGGING_MODE_REQUIRED,
+      message: 'Debugging mode is required. Use BarnetMemoryStorage to enable the debugging mode.',
     })
   }
 }

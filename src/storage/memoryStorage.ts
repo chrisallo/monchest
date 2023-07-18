@@ -1,8 +1,8 @@
 
-import BNStorage, { type BNStorageData, type BNStorageProps } from '.'
+import BarnetStorage, { type BarnetStorageData, type BarnetStorageProps } from '.'
 import { sleep } from '../utils/sleep'
 
-export interface BNMemoryStorageProps extends BNStorageProps {
+export interface BarnetMemoryStorageProps extends BarnetStorageProps {
   readDelay?: number
   writeDelay?: number
 }
@@ -13,13 +13,13 @@ const DEFAULT_MEMORY_STORAGE_WRITE_DELAY = 1
 
 const store: Record<string, object> = {}
 
-export default class BNMemoryStorage extends BNStorage {
+export default class BarnetMemoryStorage extends BarnetStorage {
   private readonly delay: {
     read: number
     write: number
   }
 
-  constructor(props: BNMemoryStorageProps) {
+  constructor(props: BarnetMemoryStorageProps) {
     super({
       ...props,
       maxRawSize: props.maxRawSize ?? MEMORY_ITEM_SIZE_LIMIT,
@@ -48,9 +48,9 @@ export default class BNMemoryStorage extends BNStorage {
     await sleep(this.delay.read)
     return store[this.name][key] ?? null
   }
-  protected async setRaw(items: BNStorageData[]): Promise<void> {
+  protected async setRaw(items: BarnetStorageData[]): Promise<void> {
     await sleep(this.delay.write)
-    items.forEach((item: BNStorageData): void => {
+    items.forEach((item: BarnetStorageData): void => {
       store[this.name][item.key] = { ...item.value }
     })
   }

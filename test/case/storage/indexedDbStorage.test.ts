@@ -1,6 +1,6 @@
 
 import 'fake-indexeddb/auto'
-import BNIndexedDbStorage from '../../../src/storage/indexedDbStorage'
+import BarnetIndexedDbStorage from '../../../src/storage/indexedDbStorage'
 
 describe('storage/indexedDbStorage', () => {
   const TEST_STORAGE_NAME = 'teststorage'
@@ -19,7 +19,7 @@ describe('storage/indexedDbStorage', () => {
   }
 
   afterEach(async () => {
-    const storage = new BNIndexedDbStorage({
+    const storage = new BarnetIndexedDbStorage({
       name: TEST_STORAGE_NAME,
     })
     await storage.init()
@@ -27,14 +27,14 @@ describe('storage/indexedDbStorage', () => {
   })
 
   test('new', async () => {
-    const storage = new BNIndexedDbStorage({
+    const storage = new BarnetIndexedDbStorage({
       name: TEST_STORAGE_NAME,
     })
     await storage.init()
     expect(storage.name).toBe(TEST_STORAGE_NAME)
   })
   test('getAllKeys() empty', async () => {
-    const storage = new BNIndexedDbStorage({
+    const storage = new BarnetIndexedDbStorage({
       name: TEST_STORAGE_NAME,
     })
     await storage.init()
@@ -43,7 +43,7 @@ describe('storage/indexedDbStorage', () => {
     expect(keys).toHaveLength(0)
   })
   test('get() empty', async () => {
-    const storage = new BNIndexedDbStorage({
+    const storage = new BarnetIndexedDbStorage({
       name: TEST_STORAGE_NAME,
     })
     await storage.init()
@@ -53,7 +53,7 @@ describe('storage/indexedDbStorage', () => {
     expect(value).toBeNull()
   })
   test('set() > get()', async () => {
-    const storage = new BNIndexedDbStorage({
+    const storage = new BarnetIndexedDbStorage({
       name: TEST_STORAGE_NAME,
     })
     await storage.init()
@@ -65,7 +65,7 @@ describe('storage/indexedDbStorage', () => {
     expect(value).toStrictEqual(data.value)
   })
   test('set() > get() with encryption', async () => {
-    const storage = new BNIndexedDbStorage({
+    const storage = new BarnetIndexedDbStorage({
       name: TEST_STORAGE_NAME,
       encryptionPolicy: {
         encrypt: (data: object) => {
@@ -86,7 +86,7 @@ describe('storage/indexedDbStorage', () => {
     expect(value).toStrictEqual(data.value)
   })
   test('set() multiple shards > get()', async () => {
-    const storage = new BNIndexedDbStorage({
+    const storage = new BarnetIndexedDbStorage({
       name: TEST_STORAGE_NAME,
       maxRawSize: 10,
     })
@@ -99,7 +99,7 @@ describe('storage/indexedDbStorage', () => {
     expect(value).toStrictEqual(data)
   })
   test('set() > remove() > get()', async () => {
-    const storage = new BNIndexedDbStorage({
+    const storage = new BarnetIndexedDbStorage({
       name: TEST_STORAGE_NAME,
     })
     await storage.init()
@@ -112,7 +112,7 @@ describe('storage/indexedDbStorage', () => {
     expect(value).toBeNull()
   })
   test('set() multiple shards > remove() > get()', async () => {
-    const storage = new BNIndexedDbStorage({
+    const storage = new BarnetIndexedDbStorage({
       name: TEST_STORAGE_NAME,
       maxRawSize: 10,
     })
@@ -126,7 +126,7 @@ describe('storage/indexedDbStorage', () => {
     expect(value).toBeNull()
   })
   test('setMany() > get()', async () => {
-    const storage = new BNIndexedDbStorage({
+    const storage = new BarnetIndexedDbStorage({
       name: TEST_STORAGE_NAME,
     })
     await storage.init()
@@ -144,7 +144,7 @@ describe('storage/indexedDbStorage', () => {
     expect(value3).toStrictEqual(list[2].value)
   })
   test('setMany() multiple shards > get()', async () => {
-    const storage = new BNIndexedDbStorage({
+    const storage = new BarnetIndexedDbStorage({
       name: TEST_STORAGE_NAME,
       maxRawSize: 10,
     })
@@ -163,7 +163,7 @@ describe('storage/indexedDbStorage', () => {
     expect(value3).toStrictEqual(list[2].value)
   })
   test('setMany() > remove() > get()', async () => {
-    const storage = new BNIndexedDbStorage({
+    const storage = new BarnetIndexedDbStorage({
       name: TEST_STORAGE_NAME,
     })
     await storage.init()
@@ -176,7 +176,7 @@ describe('storage/indexedDbStorage', () => {
     expect(value).toBeNull()
   })
   test('setMany() multiple shards > remove() > get()', async () => {
-    const storage = new BNIndexedDbStorage({
+    const storage = new BarnetIndexedDbStorage({
       name: TEST_STORAGE_NAME,
       maxRawSize: 10,
     })
@@ -190,7 +190,7 @@ describe('storage/indexedDbStorage', () => {
     expect(value).toBeNull()
   })
   test('setMany() > removeMany() > get()', async () => {
-    const storage = new BNIndexedDbStorage({
+    const storage = new BarnetIndexedDbStorage({
       name: TEST_STORAGE_NAME,
     })
     await storage.init()
@@ -209,7 +209,7 @@ describe('storage/indexedDbStorage', () => {
     expect(value3).toBeNull()
   })
   test('setMany() multiple shards > removeMany() > get()', async () => {
-    const storage = new BNIndexedDbStorage({
+    const storage = new BarnetIndexedDbStorage({
       name: TEST_STORAGE_NAME,
       maxRawSize: 10,
     })

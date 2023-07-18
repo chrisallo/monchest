@@ -1,5 +1,5 @@
 
-import { BNError, Barnet } from '../../src/barnet'
+import { BarnetError, Barnet } from '../../src/barnet'
 import { Blob } from 'blob-polyfill'
 
 describe('barnet', () => {
@@ -31,7 +31,7 @@ describe('barnet', () => {
     const func = jest.fn(() => {
       barnet.getMemoryStoreForDebugging()
     })
-    expect(func).toThrowError(BNError.debuggingModeRequired)
+    expect(func).toThrowError(BarnetError.debuggingModeRequired)
   })
   test('save() > load() string', async () => {
     const barnet = new Barnet({

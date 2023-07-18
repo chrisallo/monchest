@@ -21,7 +21,7 @@ const barnet = new Barnet({
   name: 'samplestorage',
 
   // data storage type (optional, default=Memory)
-  storage: BNStorageType.Memory,
+  storage: BarnetStorageType.Memory,
 
   // encryption algorithm (optional, default is no encryption)
   encryptionPolicy: {

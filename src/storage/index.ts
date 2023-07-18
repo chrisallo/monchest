@@ -1,7 +1,7 @@
 
 import { warning } from '../utils/logger'
 
-export interface BNEncryptionPolicy {
+export interface BarnetEncryptionPolicy {
   /**
    * @describe
    *  The function to encrypt an object to an encrypted string.
@@ -18,16 +18,16 @@ export interface BNEncryptionPolicy {
 /**
  * @internal
  */
-export interface BNStorageProps {
+export interface BarnetStorageProps {
   name: string
   maxRawSize?: number
-  encryptionPolicy?: BNEncryptionPolicy
+  encryptionPolicy?: BarnetEncryptionPolicy
 }
 
 /**
  * @internal
  */
-export interface BNStorageData {
+export interface BarnetStorageData {
   key: string
   value: object
 }
@@ -35,12 +35,12 @@ export interface BNStorageData {
 /**
  * @internal
  */
-interface BNStorageDataShard {
+interface BarnetStorageDataShard {
   data: string
   numberOfShards?: number
 }
 
-const DEFAULT_ENCRYPTION_POLICY: BNEncryptionPolicy = {
+const DEFAULT_ENCRYPTION_POLICY: BarnetEncryptionPolicy = {
   encrypt: (data: object) => JSON.stringify(data),
   decrypt: (encrypted: string) => JSON.parse(encrypted),
 }
@@ -48,9 +48,9 @@ const ENCRYPTION_CHECK_DUMMY = { a: 100, n: 'stacktrace' }
 const DEFAULT_MAX_RAW_SIZE = 4096
 const MINIMUM_MAX_RAW_SIZE = 10
 
-export default abstract class BNStorage {
+export default abstract class BarnetStorage {
   readonly name: string
-  readonly encryptionPolicy: BNEncryptionPolicy
+  readonly encryptionPolicy: BarnetEncryptionPolicy
   protected readonly maxRawSize: number
 
   private get reservedKeys(): string[] {
@@ -64,7 +64,7 @@ export default abstract class BNStorage {
 
   protected abstract getAllRawKeys(): Promise<string[]>
   protected abstract getRaw(key: string): Promise<object | null>
-  protected abstract setRaw(data: BNStorageData[]): Promise<void>
+  protected abstract setRaw(data: BarnetStorageData[]): Promise<void>
   protected abstract removeRaw(keys: string[]): Promise<void>
 
   protected async resetIfEncryptionChanged(): Promise<void> {
@@ -90,7 +90,7 @@ export default abstract class BNStorage {
   private generateShardPostfixArray(count = 1): number[] {
     return [...Array(count).keys()]
   }
-  private shardify(item: BNStorageData): BNStorageData[] {
+  private shardify(item: BarnetStorageData): BarnetStorageData[] {
     const { key, value } = item
     const data = this.encryptionPolicy.encrypt(value)
     const numberOfshards = Math.ceil(data.length / this.maxRawSize)
@@ -98,20 +98,20 @@ export default abstract class BNStorage {
     return this.generateShardPostfixArray(numberOfshards)
       .map((index: number) => {
         const rawKey = this.createRawKey(key, index)
-        const shard: BNStorageData = {
+        const shard: BarnetStorageData = {
           key: rawKey,
           value: {
             data: data.substring(index * this.maxRawSize, (index + 1) * this.maxRawSize),
           },
         }
         if (index === 0) {
-          (shard.value as BNStorageDataShard).numberOfShards = numberOfshards
+          (shard.value as BarnetStorageDataShard).numberOfShards = numberOfshards
         }
         return shard
       })
   }
 
-  constructor(props: BNStorageProps) {
+  constructor(props: BarnetStorageProps) {
     const {
       name,
       maxRawSize,
@@ -133,14 +133,14 @@ export default abstract class BNStorage {
     const rawData = await this.getRaw(rawKey)
     if (rawData) {
       try {
-        const { data, numberOfShards } = rawData as BNStorageDataShard
+        const { data, numberOfShards } = rawData as BarnetStorageDataShard
         const shards = numberOfShards && numberOfShards > 1
           ? await Promise.all(
             this.generateShardPostfixArray(numberOfShards)
               .map(async (index: number) => {
                 if (index > 0) {
                   const rawKey = this.createRawKey(key, index)
-                  const rawData = await this.getRaw(rawKey) as BNStorageDataShard
+                  const rawData = await this.getRaw(rawKey) as BarnetStorageDataShard
                   return rawData?.data
                 } else return data
               }),
@@ -157,15 +157,15 @@ export default abstract class BNStorage {
     const shards = this.shardify({ key, value })
     await this.setRaw(shards)
   }
-  async setMany(items: BNStorageData[]): Promise<void> {
-    const shards: BNStorageData[] = items.map((item: BNStorageData) => this.shardify(item)).flat()
+  async setMany(items: BarnetStorageData[]): Promise<void> {
+    const shards: BarnetStorageData[] = items.map((item: BarnetStorageData) => this.shardify(item)).flat()
     await this.setRaw(shards)
   }
   async remove(key: string): Promise<boolean> {
     const rawKey = this.createRawKey(key)
     const rawData = await this.getRaw(rawKey)
     if (rawData) {
-      const { numberOfShards } = rawData as BNStorageDataShard
+      const { numberOfShards } = rawData as BarnetStorageDataShard
       await this.removeRaw(
         this.generateShardPostfixArray(numberOfShards)
           .map((index: number) => this.createRawKey(key, index)),
@@ -180,7 +180,7 @@ export default abstract class BNStorage {
       const rawKey = this.createRawKey(key)
       const rawData = await this.getRaw(rawKey)
       if (rawData) {
-        const { numberOfShards } = rawData as BNStorageDataShard
+        const { numberOfShards } = rawData as BarnetStorageDataShard
         rawKeys.push(...this.generateShardPostfixArray(numberOfShards)
           .map((index: number) => this.createRawKey(key, index)))
       }

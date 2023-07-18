@@ -1,18 +1,18 @@
-import BNError, { BNErrorCode } from "../../src/error"
+import BarnetError, { BarnetErrorCode } from "../../src/error"
 
 describe('error', () => {
   const TEST_ERROR_MESSAGE = 'testerrormessage'
 
   test('new', () => {
-    const err = new BNError({
-      code: BNErrorCode.DEBUGGING_MODE_REQUIRED,
+    const err = new BarnetError({
+      code: BarnetErrorCode.DEBUGGING_MODE_REQUIRED,
       message: TEST_ERROR_MESSAGE,
     })
-    expect(err.code).toBe(BNErrorCode.DEBUGGING_MODE_REQUIRED)
+    expect(err.code).toBe(BarnetErrorCode.DEBUGGING_MODE_REQUIRED)
     expect(err.message).toBe(TEST_ERROR_MESSAGE)
   })
   test('static', () => {
-    const err = BNError.storageNotAvailable
-    expect(err.code).toBe(BNErrorCode.STORAGE_NOT_AVAILABLE)
+    const err = BarnetError.storageNotAvailable
+    expect(err.code).toBe(BarnetErrorCode.STORAGE_NOT_AVAILABLE)
   })
 })

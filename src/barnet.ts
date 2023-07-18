@@ -1,10 +1,10 @@
 
-import BNStorage, { BNEncryptionPolicy, BNStorageData } from './storage'
-import BNMemoryStorage from './storage/memoryStorage'
-import BNIndexedDbStorage from './storage/indexedDbStorage'
-import BNError, { BNErrorCode } from './error'
+import BarnetStorage, { BarnetEncryptionPolicy, BarnetStorageData } from './storage'
+import BarnetMemoryStorage from './storage/memoryStorage'
+import BarnetIndexedDbStorage from './storage/indexedDbStorage'
+import BarnetError, { BarnetErrorCode } from './error'
 
-enum BNStorageType {
+enum BarnetStorageType {
   Memory = 'memory',
   IndexedDB = 'indexeddb',
 }
@@ -23,18 +23,18 @@ interface BarnetProps {
   debugMode?: boolean
 
   /**
-   * @default BNStorageType.Memory
+   * @default BarnetStorageType.Memory
    * @description
    *  To select a storage type.
    */
-  storage?: BNStorageType
+  storage?: BarnetStorageType
 
   /**
    * @description
    *  To inject the encrypt/decrypt algorithm.
    *  If the encryption algorithm changes, Barnet would automatically detect it and clear the data before use.
    */
-  encryptionPolicy?: BNEncryptionPolicy
+  encryptionPolicy?: BarnetEncryptionPolicy
 }
 
 /**
@@ -46,7 +46,7 @@ type BarnetStorable = string | object | Blob
 /**
  * @internal
  */
-enum BNStoredDataType {
+enum BarnetStoredDataType {
   String = 'string',
   Object = 'json',
   Blob = 'binary',
@@ -56,25 +56,25 @@ enum BNStoredDataType {
 /**
  * @internal
  */
-interface BNStoredUnit {
-  type: BNStoredDataType
+interface BarnetStoredUnit {
+  type: BarnetStoredDataType
   data: string | object
 }
 
 class Barnet {
   readonly name: string
 
-  private readonly encryptionPolicy?: BNEncryptionPolicy
+  private readonly encryptionPolicy?: BarnetEncryptionPolicy
   private readonly debugMode: boolean
 
-  private storage: BNStorage
+  private storage: BarnetStorage
   private storageInitialized: boolean
 
   constructor(props: BarnetProps) {
     const {
       name,
       debugMode = false,
-      storage = BNStorageType.Memory,
+      storage = BarnetStorageType.Memory,
       encryptionPolicy,
     } = props
 
@@ -84,14 +84,14 @@ class Barnet {
     this.encryptionPolicy = encryptionPolicy
 
     switch (storage) {
-      case BNStorageType.Memory:
-        this.storage = new BNMemoryStorage({
+      case BarnetStorageType.Memory:
+        this.storage = new BarnetMemoryStorage({
           name,
           encryptionPolicy,
         })
         break
-      case BNStorageType.IndexedDB:
-        this.storage = new BNIndexedDbStorage({
+      case BarnetStorageType.IndexedDB:
+        this.storage = new BarnetIndexedDbStorage({
           name,
           encryptionPolicy,
         })
@@ -100,7 +100,7 @@ class Barnet {
   }
 
   private fallbackToMemoryStorage(): void {
-    this.storage = new BNMemoryStorage({
+    this.storage = new BarnetMemoryStorage({
       name: this.name,
       encryptionPolicy: this.encryptionPolicy,
     })
@@ -111,9 +111,9 @@ class Barnet {
         await this.storage.init()
         this.storageInitialized = true
       } catch (err) {
-        if (err instanceof BNError) {
+        if (err instanceof BarnetError) {
           switch (err.code) {
-            case BNErrorCode.STORAGE_NOT_AVAILABLE: {
+            case BarnetErrorCode.STORAGE_NOT_AVAILABLE: {
               this.fallbackToMemoryStorage()
               await this.guaranteeStorageInitialized()
               break
@@ -131,11 +131,11 @@ class Barnet {
    */
   getMemoryStoreForDebugging(): object {
     if (this.debugMode) {
-      if (this.storage instanceof BNMemoryStorage) {
+      if (this.storage instanceof BarnetMemoryStorage) {
         return this.storage.rawData
       }
     }
-    throw BNError.debuggingModeRequired
+    throw BarnetError.debuggingModeRequired
   }
 
   /**
@@ -144,25 +144,25 @@ class Barnet {
    */
   async save(key: string, data: BarnetStorable): Promise<void> {
     await this.guaranteeStorageInitialized()
-    const unit: BNStoredUnit = {
+    const unit: BarnetStoredUnit = {
       data,
-      type: BNStoredDataType.Unknown
+      type: BarnetStoredDataType.Unknown
     }
     if (data instanceof Blob) {
       unit.data = {
         dataUrl: await new Promise<string>((resolve, reject) => {
           const fileReader = new FileReader()
           fileReader.onload = () => resolve(fileReader.result as string)
-          fileReader.onerror = () => reject(BNError.dataEncodingFailed)
+          fileReader.onerror = () => reject(BarnetError.dataEncodingFailed)
           fileReader.readAsDataURL(data)
         }),
         type: data.type,
       }
-      unit.type = BNStoredDataType.Blob
+      unit.type = BarnetStoredDataType.Blob
     } else if (typeof data === 'object') {
-      unit.type = BNStoredDataType.Object
+      unit.type = BarnetStoredDataType.Object
     } else if (typeof data === 'string') {
-      unit.type = BNStoredDataType.String
+      unit.type = BarnetStoredDataType.String
     }
     await this.storage?.set(key, unit)
   }
@@ -173,10 +173,10 @@ class Barnet {
    */
   async load(key: string): Promise<BarnetStorable | null> {
     await this.guaranteeStorageInitialized()
-    const unit = await this.storage?.get(key) as BNStoredUnit
+    const unit = await this.storage?.get(key) as BarnetStoredUnit
     if (unit) {
       switch (unit.type) {
-        case BNStoredDataType.Blob: {
+        case BarnetStoredDataType.Blob: {
           const { dataUrl, type } = unit.data as { dataUrl: string, type: string }
           if (typeof fetch !== 'undefined') {
             const res = await fetch(dataUrl)
@@ -196,8 +196,8 @@ class Barnet {
             return new Blob(byteArrays, { type })
           }
         }
-        case BNStoredDataType.Object:
-        case BNStoredDataType.String:
+        case BarnetStoredDataType.Object:
+        case BarnetStoredDataType.String:
           return unit.data
       }
     }
@@ -224,12 +224,12 @@ class Barnet {
 }
 
 export {
-  BNEncryptionPolicy,
-  BNError,
-  BNErrorCode,
+  BarnetEncryptionPolicy,
+  BarnetError,
+  BarnetErrorCode,
   Barnet,
   BarnetProps,
   BarnetStorable,
-  BNStorageData,
-  BNStorageType,
+  BarnetStorageData,
+  BarnetStorageType,
 }

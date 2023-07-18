@@ -1,6 +1,6 @@
 
-import BNStorage, { type BNStorageData, type BNStorageProps } from '.'
-import BNError from '../error'
+import BarnetStorage, { type BarnetStorageData, type BarnetStorageProps } from '.'
+import BarnetError from '../error'
 import { isBrowser, isLegacyEdgeBrowser } from '../utils/compat'
 
 interface WindowCompat extends Window {
@@ -32,16 +32,16 @@ const INDEXEDDB_OBJECTSTORE_NAME = 'Barnet'
 const INDEXEDDB_ITEM_SIZE_LIMIT = 100 * 1024 * 1024 // 100MB
 const INDEXEDDB_REOPEN_DELAY = 10
 
-export interface BNIndexedDbStorageProps extends BNStorageProps {}
+export interface BarnetIndexedDbStorageProps extends BarnetStorageProps {}
 
-export default class BNIndexedDbStorage extends BNStorage {
+export default class BarnetIndexedDbStorage extends BarnetStorage {
   private state: IndexedDbStorageState
   private window?: WindowCompat
   private indexedDb?: IDBFactory
   private database?: IDBDatabase
   private openJobQueue: IndexedDbOpenJob[] = []
 
-  constructor(props: BNIndexedDbStorageProps) {
+  constructor(props: BarnetIndexedDbStorageProps) {
     super({
       ...props,
       maxRawSize: INDEXEDDB_ITEM_SIZE_LIMIT,
@@ -83,7 +83,7 @@ export default class BNIndexedDbStorage extends BNStorage {
           reject(ev.target.error)
         })
       } else {
-        reject(BNError.storageNotAvailable)
+        reject(BarnetError.storageNotAvailable)
       }
     })
   }
@@ -94,7 +94,7 @@ export default class BNIndexedDbStorage extends BNStorage {
       switch (this.state) {
         case IndexedDbStorageState.UNINITIALIZED:
         case IndexedDbStorageState.OPEN:
-          throw BNError.storeNotInitialized
+          throw BarnetError.storeNotInitialized
 
         case IndexedDbStorageState.OPENING:
         case IndexedDbStorageState.CLOSED:
@@ -111,28 +111,28 @@ export default class BNIndexedDbStorage extends BNStorage {
       if (this.window && isBrowser()) {
         if (isLegacyEdgeBrowser()) {
           if (!this.window.indexedDB && (this.window.PointerEvent || this.window.MSPointerEvent)) {
-            throw BNError.storageNotAvailable
+            throw BarnetError.storageNotAvailable
           }
         } else {
           await new Promise<void>((resolve, reject) => {
             if (this.indexedDb) {
               try {
                 const db = this.indexedDb.open('_testMozilla')
-                db.onerror = () => reject(BNError.storageNotAvailable)
+                db.onerror = () => reject(BarnetError.storageNotAvailable)
                 db.onsuccess = () => resolve()
               } catch {
-                reject(BNError.storageNotAvailable)
+                reject(BarnetError.storageNotAvailable)
               }
             } else {
-              reject(BNError.storageNotAvailable)
+              reject(BarnetError.storageNotAvailable)
             }
           })
         }
       } else {
-        throw BNError.storageNotAvailable
+        throw BarnetError.storageNotAvailable
       }
     } else {
-      throw BNError.storageNotAvailable
+      throw BarnetError.storageNotAvailable
     }
     this.database = await this.open()
     await this.resetIfEncryptionChanged()
@@ -158,16 +158,16 @@ export default class BNIndexedDbStorage extends BNStorage {
     return await new Promise((resolve, reject) => {
       const request: IDBRequest = objectStore.get(key)
       request.addEventListener('success', (ev: IDBGetRequestEvent) => {
-        const data = ev?.target?.result as BNStorageData
+        const data = ev?.target?.result as BarnetStorageData
         resolve(data?.value)
       })
       request.addEventListener('error', (ev: IDBGetRequestEvent) => reject(ev.target.error))
     })
   }
-  protected async setRaw(items: BNStorageData[]): Promise<void> {
+  protected async setRaw(items: BarnetStorageData[]): Promise<void> {
     const objectStore = await this.getObjectStore('readwrite')
     await Promise.all<void>(
-      items.map((item: BNStorageData) => {
+      items.map((item: BarnetStorageData) => {
         return new Promise((resolve, reject) => {
           const request: IDBRequest = objectStore.put(item)
           request.addEventListener('success', (ev: IDBPutRequestEvent) => resolve())
