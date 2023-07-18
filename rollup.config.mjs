@@ -7,7 +7,7 @@ import terser from '@rollup/plugin-terser'
 export default {
   input: 'src/glacier.ts',
   output: {
-    dir: 'dist',
+    dir: '.',
     format: 'esm'
   },
   plugins: [
