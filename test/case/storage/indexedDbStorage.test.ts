@@ -64,6 +64,27 @@ describe('storage/indexedDbStorage', () => {
     const value = await storage.get(data.key)
     expect(value).toStrictEqual(data.value)
   })
+  test('set() > get() with encryption', async () => {
+    const storage = new GLIndexedDbStorage({
+      name: TEST_STORAGE_NAME,
+      encryptionPolicy: {
+        encrypt: (data: object) => {
+          return JSON.stringify(data) + 'sampleencryptionkey'
+        },
+        decrypt: (encrypted: string) => {
+          const len = encrypted.indexOf('sampleencryptionkey')
+          return JSON.parse(encrypted.slice(0, len))
+        },
+      }
+    })
+    await storage.init()
+
+    const [data] = generateTestData()
+    await storage.set(data.key, data.value)
+
+    const value = await storage.get(data.key)
+    expect(value).toStrictEqual(data.value)
+  })
   test('set() multiple shards > get()', async () => {
     const storage = new GLIndexedDbStorage({
       name: TEST_STORAGE_NAME,
