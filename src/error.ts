@@ -1,5 +1,5 @@
 
-export enum GLErrorCode {
+export enum BNErrorCode {
   /**
    * @describe The environment does not support the storage type.
    */
@@ -24,18 +24,18 @@ export enum GLErrorCode {
 /**
  * @internal
  */
-interface GLErrorProps {
-  code: GLErrorCode
+interface BNErrorProps {
+  code: BNErrorCode
   message: string
 }
 
-export default class GLError extends Error {
-  readonly code: GLErrorCode
+export default class BNError extends Error {
+  readonly code: BNErrorCode
 
   /**
    * @private
    */
-  constructor(props: GLErrorProps) {
+  constructor(props: BNErrorProps) {
     super(props.message)
     this.code = props.code
   }
@@ -43,9 +43,9 @@ export default class GLError extends Error {
   /**
    * @internal
    */
-  static get storageNotAvailable(): GLError {
-    return new GLError({
-      code: GLErrorCode.STORAGE_NOT_AVAILABLE,
+  static get storageNotAvailable(): BNError {
+    return new BNError({
+      code: BNErrorCode.STORAGE_NOT_AVAILABLE,
       message: 'Storage not available.',
     })
   }
@@ -53,9 +53,9 @@ export default class GLError extends Error {
   /**
    * @internal
    */
-  static get storeNotInitialized(): GLError {
-    return new GLError({
-      code: GLErrorCode.STORAGE_NOT_AVAILABLE,
+  static get storeNotInitialized(): BNError {
+    return new BNError({
+      code: BNErrorCode.STORAGE_NOT_AVAILABLE,
       message: 'Storage is not initialized.',
     })
   }
@@ -63,9 +63,9 @@ export default class GLError extends Error {
   /**
    * @internal
    */
-  static get dataEncodingFailed(): GLError {
-    return new GLError({
-      code: GLErrorCode.DATA_ENCODING_FAILED,
+  static get dataEncodingFailed(): BNError {
+    return new BNError({
+      code: BNErrorCode.DATA_ENCODING_FAILED,
       message: 'Failed to read data from Blob.',
     })
   }
@@ -73,10 +73,10 @@ export default class GLError extends Error {
   /**
    * @internal
    */
-  static get debuggingModeRequired(): GLError {
-    return new GLError({
-      code: GLErrorCode.DEBUGGING_MODE_REQUIRED,
-      message: 'Debugging mode is required. Use GLMemoryStorage to enable the debugging mode.',
+  static get debuggingModeRequired(): BNError {
+    return new BNError({
+      code: BNErrorCode.DEBUGGING_MODE_REQUIRED,
+      message: 'Debugging mode is required. Use BNMemoryStorage to enable the debugging mode.',
     })
   }
 }

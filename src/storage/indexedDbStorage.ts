@@ -1,6 +1,6 @@
 
-import GLStorage, { type GLStorageData, type GLStorageProps } from '.'
-import GLError from '../error'
+import BNStorage, { type BNStorageData, type BNStorageProps } from '.'
+import BNError from '../error'
 import { isBrowser, isLegacyEdgeBrowser } from '../utils/compat'
 
 interface WindowCompat extends Window {
@@ -28,20 +28,20 @@ enum IndexedDbStorageState {
   CLOSED,
 }
 
-const INDEXEDDB_OBJECTSTORE_NAME = 'Glacier'
+const INDEXEDDB_OBJECTSTORE_NAME = 'Barnet'
 const INDEXEDDB_ITEM_SIZE_LIMIT = 100 * 1024 * 1024 // 100MB
 const INDEXEDDB_REOPEN_DELAY = 10
 
-export interface GLIndexedDbStorageProps extends GLStorageProps {}
+export interface BNIndexedDbStorageProps extends BNStorageProps {}
 
-export default class GLIndexedDbStorage extends GLStorage {
+export default class BNIndexedDbStorage extends BNStorage {
   private state: IndexedDbStorageState
   private window?: WindowCompat
   private indexedDb?: IDBFactory
   private database?: IDBDatabase
   private openJobQueue: IndexedDbOpenJob[] = []
 
-  constructor(props: GLIndexedDbStorageProps) {
+  constructor(props: BNIndexedDbStorageProps) {
     super({
       ...props,
       maxRawSize: INDEXEDDB_ITEM_SIZE_LIMIT,
@@ -83,7 +83,7 @@ export default class GLIndexedDbStorage extends GLStorage {
           reject(ev.target.error)
         })
       } else {
-        reject(GLError.storageNotAvailable)
+        reject(BNError.storageNotAvailable)
       }
     })
   }
@@ -94,7 +94,7 @@ export default class GLIndexedDbStorage extends GLStorage {
       switch (this.state) {
         case IndexedDbStorageState.UNINITIALIZED:
         case IndexedDbStorageState.OPEN:
-          throw GLError.storeNotInitialized
+          throw BNError.storeNotInitialized
 
         case IndexedDbStorageState.OPENING:
         case IndexedDbStorageState.CLOSED:
@@ -111,28 +111,28 @@ export default class GLIndexedDbStorage extends GLStorage {
       if (this.window && isBrowser()) {
         if (isLegacyEdgeBrowser()) {
           if (!this.window.indexedDB && (this.window.PointerEvent || this.window.MSPointerEvent)) {
-            throw GLError.storageNotAvailable
+            throw BNError.storageNotAvailable
           }
         } else {
           await new Promise<void>((resolve, reject) => {
             if (this.indexedDb) {
               try {
                 const db = this.indexedDb.open('_testMozilla')
-                db.onerror = () => reject(GLError.storageNotAvailable)
+                db.onerror = () => reject(BNError.storageNotAvailable)
                 db.onsuccess = () => resolve()
               } catch {
-                reject(GLError.storageNotAvailable)
+                reject(BNError.storageNotAvailable)
               }
             } else {
-              reject(GLError.storageNotAvailable)
+              reject(BNError.storageNotAvailable)
             }
           })
         }
       } else {
-        throw GLError.storageNotAvailable
+        throw BNError.storageNotAvailable
       }
     } else {
-      throw GLError.storageNotAvailable
+      throw BNError.storageNotAvailable
     }
     this.database = await this.open()
     await this.resetIfEncryptionChanged()
@@ -158,16 +158,16 @@ export default class GLIndexedDbStorage extends GLStorage {
     return await new Promise((resolve, reject) => {
       const request: IDBRequest = objectStore.get(key)
       request.addEventListener('success', (ev: IDBGetRequestEvent) => {
-        const data = ev?.target?.result as GLStorageData
+        const data = ev?.target?.result as BNStorageData
         resolve(data?.value)
       })
       request.addEventListener('error', (ev: IDBGetRequestEvent) => reject(ev.target.error))
     })
   }
-  protected async setRaw(items: GLStorageData[]): Promise<void> {
+  protected async setRaw(items: BNStorageData[]): Promise<void> {
     const objectStore = await this.getObjectStore('readwrite')
     await Promise.all<void>(
-      items.map((item: GLStorageData) => {
+      items.map((item: BNStorageData) => {
         return new Promise((resolve, reject) => {
           const request: IDBRequest = objectStore.put(item)
           request.addEventListener('success', (ev: IDBPutRequestEvent) => resolve())

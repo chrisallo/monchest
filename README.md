@@ -1,7 +1,7 @@
 
-# Glacier
+# Barnet
 
-`Glacier` is a data store engine for web browser. It supports unlimited data store for string, object, and binary(blob) data regardless of the per-item size limit.
+`Barnet` is a data store engine for web browser. It supports unlimited data store for string, object, and binary(blob) data regardless of the per-item size limit.
 
 ## Installation
 
@@ -16,12 +16,12 @@ or
 ## Usage
 
 ```ts
-const gl = new Glacier({
+const gl = new Barnet({
   // data storage name
   name: 'samplestorage',
 
   // data storage type (optional, default=Memory)
-  storage: GLStorageType.Memory,
+  storage: BNStorageType.Memory,
 
   // encryption algorithm (optional, default is no encryption)
   encryptionPolicy: {

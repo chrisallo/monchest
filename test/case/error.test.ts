@@ -1,18 +1,18 @@
-import GLError, { GLErrorCode } from "../../src/error"
+import BNError, { BNErrorCode } from "../../src/error"
 
 describe('error', () => {
   const TEST_ERROR_MESSAGE = 'testerrormessage'
 
   test('new', () => {
-    const err = new GLError({
-      code: GLErrorCode.DEBUGGING_MODE_REQUIRED,
+    const err = new BNError({
+      code: BNErrorCode.DEBUGGING_MODE_REQUIRED,
       message: TEST_ERROR_MESSAGE,
     })
-    expect(err.code).toBe(GLErrorCode.DEBUGGING_MODE_REQUIRED)
+    expect(err.code).toBe(BNErrorCode.DEBUGGING_MODE_REQUIRED)
     expect(err.message).toBe(TEST_ERROR_MESSAGE)
   })
   test('static', () => {
-    const err = GLError.storageNotAvailable
-    expect(err.code).toBe(GLErrorCode.STORAGE_NOT_AVAILABLE)
+    const err = BNError.storageNotAvailable
+    expect(err.code).toBe(BNErrorCode.STORAGE_NOT_AVAILABLE)
   })
 })

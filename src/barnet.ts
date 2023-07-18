@@ -1,14 +1,14 @@
 
-import GLStorage, { GLEncryptionPolicy, GLStorageData } from './storage'
-import GLMemoryStorage from './storage/memoryStorage'
-import GLIndexedDbStorage from './storage/indexedDbStorage'
-import GLError, { GLErrorCode } from './error'
+import BNStorage, { BNEncryptionPolicy, BNStorageData } from './storage'
+import BNMemoryStorage from './storage/memoryStorage'
+import BNIndexedDbStorage from './storage/indexedDbStorage'
+import BNError, { BNErrorCode } from './error'
 
-enum GLStorageType {
+enum BNStorageType {
   Memory = 'memory',
   IndexedDB = 'indexeddb',
 }
-interface GlacierProps {
+interface BarnetProps {
   /**
    * @description
    *  A unique store name. The same key in the same store points to the same data.
@@ -23,30 +23,30 @@ interface GlacierProps {
   debugMode?: boolean
 
   /**
-   * @default GLStorageType.Memory
+   * @default BNStorageType.Memory
    * @description
    *  To select a storage type.
    */
-  storage?: GLStorageType
+  storage?: BNStorageType
 
   /**
    * @description
    *  To inject the encrypt/decrypt algorithm.
-   *  If the encryption algorithm changes, Glacier would automatically detect it and clear the data before use.
+   *  If the encryption algorithm changes, Barnet would automatically detect it and clear the data before use.
    */
-  encryptionPolicy?: GLEncryptionPolicy
+  encryptionPolicy?: BNEncryptionPolicy
 }
 
 /**
  * @description
  *  Storable types.
  */
-type GlacierStorable = string | object | Blob
+type BarnetStorable = string | object | Blob
 
 /**
  * @internal
  */
-enum GLStoredDataType {
+enum BNStoredDataType {
   String = 'string',
   Object = 'json',
   Blob = 'binary',
@@ -56,25 +56,25 @@ enum GLStoredDataType {
 /**
  * @internal
  */
-interface GLStoredUnit {
-  type: GLStoredDataType
+interface BNStoredUnit {
+  type: BNStoredDataType
   data: string | object
 }
 
-class Glacier {
+class Barnet {
   readonly name: string
 
-  private readonly encryptionPolicy?: GLEncryptionPolicy
+  private readonly encryptionPolicy?: BNEncryptionPolicy
   private readonly debugMode: boolean
 
-  private storage: GLStorage
+  private storage: BNStorage
   private storageInitialized: boolean
 
-  constructor(props: GlacierProps) {
+  constructor(props: BarnetProps) {
     const {
       name,
       debugMode = false,
-      storage = GLStorageType.Memory,
+      storage = BNStorageType.Memory,
       encryptionPolicy,
     } = props
 
@@ -84,14 +84,14 @@ class Glacier {
     this.encryptionPolicy = encryptionPolicy
 
     switch (storage) {
-      case GLStorageType.Memory:
-        this.storage = new GLMemoryStorage({
+      case BNStorageType.Memory:
+        this.storage = new BNMemoryStorage({
           name,
           encryptionPolicy,
         })
         break
-      case GLStorageType.IndexedDB:
-        this.storage = new GLIndexedDbStorage({
+      case BNStorageType.IndexedDB:
+        this.storage = new BNIndexedDbStorage({
           name,
           encryptionPolicy,
         })
@@ -100,7 +100,7 @@ class Glacier {
   }
 
   private fallbackToMemoryStorage(): void {
-    this.storage = new GLMemoryStorage({
+    this.storage = new BNMemoryStorage({
       name: this.name,
       encryptionPolicy: this.encryptionPolicy,
     })
@@ -111,9 +111,9 @@ class Glacier {
         await this.storage.init()
         this.storageInitialized = true
       } catch (err) {
-        if (err instanceof GLError) {
+        if (err instanceof BNError) {
           switch (err.code) {
-            case GLErrorCode.STORAGE_NOT_AVAILABLE: {
+            case BNErrorCode.STORAGE_NOT_AVAILABLE: {
               this.fallbackToMemoryStorage()
               await this.guaranteeStorageInitialized()
               break
@@ -131,38 +131,38 @@ class Glacier {
    */
   getMemoryStoreForDebugging(): object {
     if (this.debugMode) {
-      if (this.storage instanceof GLMemoryStorage) {
+      if (this.storage instanceof BNMemoryStorage) {
         return this.storage.rawData
       }
     }
-    throw GLError.debuggingModeRequired
+    throw BNError.debuggingModeRequired
   }
 
   /**
    * @description
    *  It saves the data with the key into the storage.
    */
-  async save(key: string, data: GlacierStorable): Promise<void> {
+  async save(key: string, data: BarnetStorable): Promise<void> {
     await this.guaranteeStorageInitialized()
-    const unit: GLStoredUnit = {
+    const unit: BNStoredUnit = {
       data,
-      type: GLStoredDataType.Unknown
+      type: BNStoredDataType.Unknown
     }
     if (data instanceof Blob) {
       unit.data = {
         dataUrl: await new Promise<string>((resolve, reject) => {
           const fileReader = new FileReader()
           fileReader.onload = () => resolve(fileReader.result as string)
-          fileReader.onerror = () => reject(GLError.dataEncodingFailed)
+          fileReader.onerror = () => reject(BNError.dataEncodingFailed)
           fileReader.readAsDataURL(data)
         }),
         type: data.type,
       }
-      unit.type = GLStoredDataType.Blob
+      unit.type = BNStoredDataType.Blob
     } else if (typeof data === 'object') {
-      unit.type = GLStoredDataType.Object
+      unit.type = BNStoredDataType.Object
     } else if (typeof data === 'string') {
-      unit.type = GLStoredDataType.String
+      unit.type = BNStoredDataType.String
     }
     await this.storage?.set(key, unit)
   }
@@ -171,12 +171,12 @@ class Glacier {
    * @description
    *  It loads the data with the key. Returns `null` if the data is not found.
    */
-  async load(key: string): Promise<GlacierStorable | null> {
+  async load(key: string): Promise<BarnetStorable | null> {
     await this.guaranteeStorageInitialized()
-    const unit = await this.storage?.get(key) as GLStoredUnit
+    const unit = await this.storage?.get(key) as BNStoredUnit
     if (unit) {
       switch (unit.type) {
-        case GLStoredDataType.Blob: {
+        case BNStoredDataType.Blob: {
           const { dataUrl, type } = unit.data as { dataUrl: string, type: string }
           if (typeof fetch !== 'undefined') {
             const res = await fetch(dataUrl)
@@ -196,8 +196,8 @@ class Glacier {
             return new Blob(byteArrays, { type })
           }
         }
-        case GLStoredDataType.Object:
-        case GLStoredDataType.String:
+        case BNStoredDataType.Object:
+        case BNStoredDataType.String:
           return unit.data
       }
     }
@@ -224,12 +224,12 @@ class Glacier {
 }
 
 export {
-  GLEncryptionPolicy,
-  GLError,
-  GLErrorCode,
-  Glacier,
-  GlacierProps,
-  GlacierStorable,
-  GLStorageData,
-  GLStorageType,
+  BNEncryptionPolicy,
+  BNError,
+  BNErrorCode,
+  Barnet,
+  BarnetProps,
+  BarnetStorable,
+  BNStorageData,
+  BNStorageType,
 }

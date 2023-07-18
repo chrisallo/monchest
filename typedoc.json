@@ -1,7 +1,7 @@
 {
-  "name": "Glacier SDK Reference",
+  "name": "Barnet SDK Reference",
   "entryPoints": [
-    "src/glacier.ts",
+    "src/barnet.ts",
   ],
   "exclude": [
     "node_modules/**/*",

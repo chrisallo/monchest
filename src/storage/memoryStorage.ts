@@ -1,8 +1,8 @@
 
-import GLStorage, { type GLStorageData, type GLStorageProps } from '.'
+import BNStorage, { type BNStorageData, type BNStorageProps } from '.'
 import { sleep } from '../utils/sleep'
 
-export interface GLMemoryStorageProps extends GLStorageProps {
+export interface BNMemoryStorageProps extends BNStorageProps {
   readDelay?: number
   writeDelay?: number
 }
@@ -13,13 +13,13 @@ const DEFAULT_MEMORY_STORAGE_WRITE_DELAY = 1
 
 const store: Record<string, object> = {}
 
-export default class GLMemoryStorage extends GLStorage {
+export default class BNMemoryStorage extends BNStorage {
   private readonly delay: {
     read: number
     write: number
   }
 
-  constructor(props: GLMemoryStorageProps) {
+  constructor(props: BNMemoryStorageProps) {
     super({
       ...props,
       maxRawSize: props.maxRawSize ?? MEMORY_ITEM_SIZE_LIMIT,
@@ -48,9 +48,9 @@ export default class GLMemoryStorage extends GLStorage {
     await sleep(this.delay.read)
     return store[this.name][key] ?? null
   }
-  protected async setRaw(items: GLStorageData[]): Promise<void> {
+  protected async setRaw(items: BNStorageData[]): Promise<void> {
     await sleep(this.delay.write)
-    items.forEach((item: GLStorageData): void => {
+    items.forEach((item: BNStorageData): void => {
       store[this.name][item.key] = { ...item.value }
     })
   }

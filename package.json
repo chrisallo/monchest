@@ -1,7 +1,7 @@
 {
-  "name": "glacier",
+  "name": "barnet",
   "version": "0.9.0",
-  "main": "glacier.js",
+  "main": "barnet.js",
   "repository": "https://github.com/chrisallo/glacier.git",
   "author": "chrisallo <chrisallo.h@gmail.com>",
   "license": "GPL-3.0-or-later",
