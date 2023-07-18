@@ -6,17 +6,17 @@
 ## Installation
 
 ```
-~$ yarn add glacier
+~$ yarn add barnet
 ```
 or
 ```
-~$ npm install glacier
+~$ npm install barnet
 ```
 
 ## Usage
 
 ```ts
-const gl = new Barnet({
+const barnet = new Barnet({
   // data storage name
   name: 'samplestorage',
 
@@ -35,13 +35,13 @@ const gl = new Barnet({
 })
 
 // save data. data type could be string | object | blob
-await gl.save(key, data)
+await barnet.save(key, data)
 
 // load data.
-const data = await gl.load(key)
+const data = await barnet.load(key)
 
 // remove data.
-await gl.remove(key)
+await barnet.remove(key)
 ```
 ## License
 
