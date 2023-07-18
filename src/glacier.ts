@@ -27,7 +27,7 @@ interface GlacierProps {
    * @description
    *  To select a storage type.
    */
-  driver?: GLStorageType
+  storage?: GLStorageType
 
   /**
    * @description
@@ -67,31 +67,31 @@ class Glacier {
   private readonly encryptionPolicy?: GLEncryptionPolicy
   private readonly debugMode: boolean
 
-  private driver: GLStorage
-  private driverInitialized: boolean
+  private storage: GLStorage
+  private storageInitialized: boolean
 
   constructor(props: GlacierProps) {
     const {
       name,
       debugMode = false,
-      driver = GLStorageType.Memory,
+      storage = GLStorageType.Memory,
       encryptionPolicy,
     } = props
 
     this.name = name
-    this.driverInitialized = false
+    this.storageInitialized = false
     this.debugMode = debugMode
     this.encryptionPolicy = encryptionPolicy
 
-    switch (driver) {
+    switch (storage) {
       case GLStorageType.Memory:
-        this.driver = new GLMemoryStorage({
+        this.storage = new GLMemoryStorage({
           name,
           encryptionPolicy,
         })
         break
       case GLStorageType.IndexedDB:
-        this.driver = new GLIndexedDbStorage({
+        this.storage = new GLIndexedDbStorage({
           name,
           encryptionPolicy,
         })
@@ -100,16 +100,16 @@ class Glacier {
   }
 
   private fallbackToMemoryStorage(): void {
-    this.driver = new GLMemoryStorage({
+    this.storage = new GLMemoryStorage({
       name: this.name,
       encryptionPolicy: this.encryptionPolicy,
     })
   }
   private async guaranteeStorageInitialized(): Promise<void> {
-    if (this.driverInitialized) {
+    if (this.storageInitialized) {
       try {
-        await this.driver.init()
-        this.driverInitialized = true
+        await this.storage.init()
+        this.storageInitialized = true
       } catch (err) {
         if (err instanceof GLError) {
           switch (err.code) {
@@ -131,8 +131,8 @@ class Glacier {
    */
   getMemoryStoreForDebugging(): object {
     if (this.debugMode) {
-      if (this.driver instanceof GLMemoryStorage) {
-        return this.driver.rawData
+      if (this.storage instanceof GLMemoryStorage) {
+        return this.storage.rawData
       }
     }
     throw GLError.debuggingModeRequired
@@ -164,7 +164,7 @@ class Glacier {
     } else if (typeof data === 'string') {
       unit.type = GLStoredDataType.String
     }
-    await this.driver?.set(key, unit)
+    await this.storage?.set(key, unit)
   }
 
   /**
@@ -173,7 +173,7 @@ class Glacier {
    */
   async load(key: string): Promise<GlacierStorable | null> {
     await this.guaranteeStorageInitialized()
-    const unit = await this.driver?.get(key) as GLStoredUnit
+    const unit = await this.storage?.get(key) as GLStoredUnit
     if (unit) {
       switch (unit.type) {
         case GLStoredDataType.Blob: {
@@ -210,7 +210,7 @@ class Glacier {
    */
   async remove(key: string): Promise<boolean> {
     await this.guaranteeStorageInitialized()
-    return await this.driver?.remove(key)
+    return await this.storage?.remove(key)
   }
 
   /**
@@ -219,7 +219,7 @@ class Glacier {
    */
   async clear(): Promise<void> {
     await this.guaranteeStorageInitialized()
-    await this.driver?.clear()
+    await this.storage?.clear()
   }
 }
 
