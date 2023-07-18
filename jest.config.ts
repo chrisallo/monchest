@@ -20,7 +20,7 @@ const config: Config = {
   ],
   preset: 'ts-jest',
   roots: [
-    "./case"
+    "."
   ],
   slowTestThreshold: 20,
   testEnvironment: "jsdom",

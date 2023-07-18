@@ -1,7 +1,7 @@
 
 import GLMemoryStorage from '../../../src/storage/memoryStorage'
 
-describe('memoryStorage', () => {
+describe('storage/memoryStorage', () => {
   const TEST_STORAGE_NAME = 'teststorage'
 
   const generateTestData = (count = 1) => {

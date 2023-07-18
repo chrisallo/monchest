@@ -1,7 +1,7 @@
 
 import { sleep } from '../../../src/utils/sleep'
 
-describe('sleep', () => {
+describe('utils/sleep', () => {
   test('sleep()', async () => {
     const bt = Date.now()
     await sleep(100)

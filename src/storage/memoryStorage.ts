@@ -51,7 +51,7 @@ export default class GLMemoryStorage extends GLStorage {
   protected async setRaw(items: GLStorageData[]): Promise<void> {
     await sleep(this.delay.write)
     items.forEach((item: GLStorageData): void => {
-      store[this.name][item.key] = item.value
+      store[this.name][item.key] = { ...item.value }
     })
   }
   protected async removeRaw(keys: string[]): Promise<void> {

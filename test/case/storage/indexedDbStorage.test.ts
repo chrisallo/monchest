@@ -2,7 +2,7 @@
 import 'fake-indexeddb/auto'
 import GLIndexedDbStorage from '../../../src/storage/indexedDbStorage'
 
-describe('indexedDbStorage', () => {
+describe('storage/indexedDbStorage', () => {
   const TEST_STORAGE_NAME = 'teststorage'
 
   const generateTestData = (count = 1) => {
