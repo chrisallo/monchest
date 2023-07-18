@@ -157,7 +157,10 @@ export default class GLIndexedDbStorage extends GLStorage {
     const objectStore = await this.getObjectStore('readonly')
     return await new Promise((resolve, reject) => {
       const request: IDBRequest = objectStore.get(key)
-      request.addEventListener('success', (ev: IDBGetRequestEvent) => resolve(ev?.target?.result as object))
+      request.addEventListener('success', (ev: IDBGetRequestEvent) => {
+        const data = ev?.target?.result as GLStorageData
+        resolve(data?.value)
+      })
       request.addEventListener('error', (ev: IDBGetRequestEvent) => reject(ev.target.error))
     })
   }

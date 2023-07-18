@@ -36,8 +36,7 @@ export interface GLStorageData {
  * @internal
  */
 interface GLStorageDataShard {
-  key: string
-  value: string
+  data: string
   numberOfShards?: number
 }
 
@@ -86,12 +85,12 @@ export default abstract class GLStorage {
   }
 
   private createRawKey(key: string, index = 0): string {
-    return `${this.name}.${key}.${index}`
+    return `${key}.${index}`
   }
   private generateShardPostfixArray(count = 1): number[] {
     return [...Array(count).keys()]
   }
-  private shardify(item: GLStorageData): GLStorageDataShard[] {
+  private shardify(item: GLStorageData): GLStorageData[] {
     const { key, value } = item
     const data = this.encryptionPolicy.encrypt(value)
     const numberOfshards = Math.ceil(data.length / this.maxRawSize)
@@ -99,12 +98,14 @@ export default abstract class GLStorage {
     return this.generateShardPostfixArray(numberOfshards)
       .map((index: number) => {
         const rawKey = this.createRawKey(key, index)
-        const shard: GLStorageDataShard = {
+        const shard: GLStorageData = {
           key: rawKey,
-          value: data.substring(index * this.maxRawSize, (index + 1) * this.maxRawSize),
+          value: {
+            data: data.substring(index * this.maxRawSize, (index + 1) * this.maxRawSize),
+          },
         }
         if (index === 0) {
-          shard.numberOfShards = numberOfshards
+          (shard.value as GLStorageDataShard).numberOfShards = numberOfshards
         }
         return shard
       })
@@ -132,7 +133,7 @@ export default abstract class GLStorage {
     const rawData = await this.getRaw(rawKey)
     if (rawData) {
       try {
-        const { value, numberOfShards } = rawData as GLStorageDataShard
+        const { data, numberOfShards } = rawData as GLStorageDataShard
         const shards = numberOfShards && numberOfShards > 1
           ? await Promise.all(
             this.generateShardPostfixArray(numberOfShards)
@@ -140,12 +141,12 @@ export default abstract class GLStorage {
                 if (index > 0) {
                   const rawKey = this.createRawKey(key, index)
                   const rawData = await this.getRaw(rawKey) as GLStorageDataShard
-                  return rawData?.value
-                } else return value
+                  return rawData?.data
+                } else return data
               }),
           )
-          : [value]
-        return this.encryptionPolicy.decrypt(JSON.parse(shards.join('')))
+          : [data]
+        return this.encryptionPolicy.decrypt(shards.join(''))
       } catch (err) {
         return null
       }
@@ -154,22 +155,11 @@ export default abstract class GLStorage {
   }
   async set(key: string, value: object): Promise<void> {
     const shards = this.shardify({ key, value })
-    await this.setRaw(shards.map((shard: GLStorageDataShard) => {
-      return {
-        key: shard.key,
-        value: shard,
-      }
-    }))
+    await this.setRaw(shards)
   }
   async setMany(items: GLStorageData[]): Promise<void> {
-    const shards: GLStorageDataShard[] = []
-    shards.concat(...items.map((item: GLStorageData) => this.shardify(item)))
-    await this.setRaw(shards.map((shard: GLStorageDataShard) => {
-      return {
-        key: shard.key,
-        value: shard,
-      }
-    }))
+    const shards: GLStorageData[] = items.map((item: GLStorageData) => this.shardify(item)).flat()
+    await this.setRaw(shards)
   }
   async remove(key: string): Promise<boolean> {
     const rawKey = this.createRawKey(key)

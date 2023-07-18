@@ -11,8 +11,9 @@ const MEMORY_ITEM_SIZE_LIMIT = 10 * 1024 * 1024 // 10MB
 const DEFAULT_MEMORY_STORAGE_READ_DELAY = 0
 const DEFAULT_MEMORY_STORAGE_WRITE_DELAY = 1
 
+const store: Record<string, object> = {}
+
 export default class GLMemoryStorage extends GLStorage {
-  private store: object
   private readonly delay: {
     read: number
     write: number
@@ -21,43 +22,43 @@ export default class GLMemoryStorage extends GLStorage {
   constructor(props: GLMemoryStorageProps) {
     super({
       ...props,
-      maxRawSize: MEMORY_ITEM_SIZE_LIMIT,
+      maxRawSize: props.maxRawSize ?? MEMORY_ITEM_SIZE_LIMIT,
     })
-    this.store = {}
+    store[this.name] = {}
     this.delay = {
       read: props.readDelay ?? DEFAULT_MEMORY_STORAGE_READ_DELAY,
       write: props.writeDelay ?? DEFAULT_MEMORY_STORAGE_WRITE_DELAY,
     }
   }
   get rawData(): object {
-    return this.store
+    return store[this.name]
   }
   async init(): Promise<void> {
-    this.store = {}
+    store[this.name] = {}
   }
   async clear(): Promise<void> {
     await sleep(this.delay.write)
-    this.store = {}
+    store[this.name] = {}
   }
   protected async getAllRawKeys(): Promise<string[]> {
     await sleep(this.delay.read)
-    return Object.keys(this.store)
+    return Object.keys(store[this.name])
   }
   protected async getRaw(key: string): Promise<object | null> {
     await sleep(this.delay.read)
-    return this.store[key] ?? null
+    return store[this.name][key] ?? null
   }
   protected async setRaw(items: GLStorageData[]): Promise<void> {
     await sleep(this.delay.write)
     items.forEach((item: GLStorageData): void => {
-      this.store[item.key] = item.value
+      store[this.name][item.key] = item.value
     })
   }
   protected async removeRaw(keys: string[]): Promise<void> {
     await sleep(this.delay.write)
     keys.forEach((key: string) => {
-      if (this.store[key]) {
-        delete this.store[key]
+      if (store[this.name][key]) {
+        delete store[this.name][key]
       }
     })
   }
