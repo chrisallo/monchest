@@ -61,4 +61,64 @@ describe('glacier', () => {
     const text = await result.text()
     expect(text).toBe(TEST_DATA_RAW_BLOB)
   })
+  test('save() > remove() > load() string', async () => {
+    const gl = new Glacier({
+      name: TEST_STORAGE_NAME,
+    })
+    await gl.save(TEST_DATA_KEY, TEST_DATA_VALUE.string)
+    await gl.remove(TEST_DATA_KEY)
+    
+    const result = await gl.load(TEST_DATA_KEY)
+    expect(result).toBeNull()
+  })
+  test('save() > remove() > load() object', async () => {
+    const gl = new Glacier({
+      name: TEST_STORAGE_NAME,
+    })
+    await gl.save(TEST_DATA_KEY, TEST_DATA_VALUE.object)
+    await gl.remove(TEST_DATA_KEY)
+    
+    const result = await gl.load(TEST_DATA_KEY)
+    expect(result).toBeNull()
+  })
+  test('save() > remove() > load() blob', async () => {
+    const gl = new Glacier({
+      name: TEST_STORAGE_NAME,
+    })
+    await gl.save(TEST_DATA_KEY, TEST_DATA_VALUE.blob)
+    await gl.remove(TEST_DATA_KEY)
+    
+    const result: Blob = await gl.load(TEST_DATA_KEY)
+    expect(result).toBeNull()
+  })
+  test('save() > clear() > load() string', async () => {
+    const gl = new Glacier({
+      name: TEST_STORAGE_NAME,
+    })
+    await gl.save(TEST_DATA_KEY, TEST_DATA_VALUE.string)
+    await gl.clear()
+    
+    const result = await gl.load(TEST_DATA_KEY)
+    expect(result).toBeNull()
+  })
+  test('save() > clear() > load() object', async () => {
+    const gl = new Glacier({
+      name: TEST_STORAGE_NAME,
+    })
+    await gl.save(TEST_DATA_KEY, TEST_DATA_VALUE.object)
+    await gl.clear()
+    
+    const result = await gl.load(TEST_DATA_KEY)
+    expect(result).toBeNull()
+  })
+  test('save() > clear() > load() blob', async () => {
+    const gl = new Glacier({
+      name: TEST_STORAGE_NAME,
+    })
+    await gl.save(TEST_DATA_KEY, TEST_DATA_VALUE.blob)
+    await gl.clear()
+    
+    const result: Blob = await gl.load(TEST_DATA_KEY)
+    expect(result).toBeNull()
+  })
 })
