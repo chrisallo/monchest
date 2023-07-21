@@ -6,6 +6,7 @@
   "repository": "https://github.com/chrisallo/monchest.git",
   "author": "chrisallo <chrisallo.h@gmail.com>",
   "license": "GPL-3.0-or-later",
+  "keywords": ["storage"],
   "module": "true",
   "scripts": {
     "lint": "eslint ./src/ --ext ts -c ./.eslintrc.js",
