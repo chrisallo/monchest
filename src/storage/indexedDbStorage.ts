@@ -17,7 +17,6 @@ type IDBRequestEvent = Event & { target: IDBRequest<unknown> }
 type IDBGetAllKeysRequestEvent = IDBRequestEvent & { target: IDBRequest<string[]> }
 type IDBGetRequestResult = { key: string, value: object }
 type IDBGetRequestEvent = IDBRequestEvent & { target: IDBRequest<IDBGetRequestResult> }
-type IDBPutRequestEvent = IDBRequestEvent & { target: IDBRequest<string> }
 
 type IndexedDbOpenJob = () => void
 
@@ -170,7 +169,7 @@ export default class BarnetIndexedDbStorage extends BarnetStorage {
       items.map((item: BarnetStorageData) => {
         return new Promise((resolve, reject) => {
           const request: IDBRequest = objectStore.put(item)
-          request.addEventListener('success', (ev: IDBPutRequestEvent) => resolve())
+          request.addEventListener('success', () => resolve())
           request.addEventListener('error', () => reject(new Error('Failed to write.')))
         })
       }),
