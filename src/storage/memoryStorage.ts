@@ -1,8 +1,8 @@
 
-import BarnetStorage, { type BarnetStorageData, type BarnetStorageProps } from '.'
+import MonchestStorage, { type MonchestStorageData, type MonchestStorageProps } from '.'
 import { sleep } from '../utils/sleep'
 
-export interface BarnetMemoryStorageProps extends BarnetStorageProps {
+export interface MonchestMemoryStorageProps extends MonchestStorageProps {
   readDelay?: number
   writeDelay?: number
 }
@@ -13,13 +13,13 @@ const DEFAULT_MEMORY_STORAGE_WRITE_DELAY = 1
 
 const store: Record<string, object> = {}
 
-export default class BarnetMemoryStorage extends BarnetStorage {
+export default class MonchestMemoryStorage extends MonchestStorage {
   private readonly delay: {
     read: number
     write: number
   }
 
-  constructor(props: BarnetMemoryStorageProps) {
+  constructor(props: MonchestMemoryStorageProps) {
     super({
       ...props,
       maxRawSize: props.maxRawSize ?? MEMORY_ITEM_SIZE_LIMIT,
@@ -48,9 +48,9 @@ export default class BarnetMemoryStorage extends BarnetStorage {
     await sleep(this.delay.read)
     return store[this.name][key] ?? null
   }
-  protected async setRaw(items: BarnetStorageData[]): Promise<void> {
+  protected async setRaw(items: MonchestStorageData[]): Promise<void> {
     await sleep(this.delay.write)
-    items.forEach((item: BarnetStorageData): void => {
+    items.forEach((item: MonchestStorageData): void => {
       store[this.name][item.key] = { ...item.value }
     })
   }

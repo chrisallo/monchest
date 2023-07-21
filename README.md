@@ -1,27 +1,27 @@
 
-# Barnet
+# Monchest
 
-`Barnet` is a data store engine for web browser. It supports unlimited data store for string, object, and binary(blob) data regardless of the per-item size limit.
+`Monchest` is a data store engine for web browser. It supports unlimited data store for string, object, and binary(blob) data regardless of the per-item size limit.
 
 ## Installation
 
 ```
-~$ yarn add barnet
+~$ yarn add monchest
 ```
 or
 ```
-~$ npm install barnet
+~$ npm install monchest
 ```
 
 ## Usage
 
 ```ts
-const barnet = new Barnet({
+const monchest = new Monchest({
   // data storage name
   name: 'samplestorage',
 
   // data storage type (optional, default=Memory)
-  storage: BarnetStorageType.Memory,
+  storage: MonchestStorageType.Memory,
 
   // encryption algorithm (optional, default is no encryption)
   encryptionPolicy: {
@@ -35,13 +35,13 @@ const barnet = new Barnet({
 })
 
 // save data. data type could be string | object | blob
-await barnet.save(key, data)
+await monchest.save(key, data)
 
 // load data.
-const data = await barnet.load(key)
+const data = await monchest.load(key)
 
 // remove data.
-await barnet.remove(key)
+await monchest.remove(key)
 ```
 ## License
 

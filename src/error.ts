@@ -1,5 +1,5 @@
 
-export enum BarnetErrorCode {
+export enum MonchestErrorCode {
   /**
    * @describe The environment does not support the storage type.
    */
@@ -24,18 +24,18 @@ export enum BarnetErrorCode {
 /**
  * @internal
  */
-interface BarnetErrorProps {
-  code: BarnetErrorCode
+interface MonchestErrorProps {
+  code: MonchestErrorCode
   message: string
 }
 
-export default class BarnetError extends Error {
-  readonly code: BarnetErrorCode
+export default class MonchestError extends Error {
+  readonly code: MonchestErrorCode
 
   /**
    * @private
    */
-  constructor(props: BarnetErrorProps) {
+  constructor(props: MonchestErrorProps) {
     super(props.message)
     this.code = props.code
   }
@@ -43,9 +43,9 @@ export default class BarnetError extends Error {
   /**
    * @internal
    */
-  static get storageNotAvailable(): BarnetError {
-    return new BarnetError({
-      code: BarnetErrorCode.STORAGE_NOT_AVAILABLE,
+  static get storageNotAvailable(): MonchestError {
+    return new MonchestError({
+      code: MonchestErrorCode.STORAGE_NOT_AVAILABLE,
       message: 'Storage not available.',
     })
   }
@@ -53,9 +53,9 @@ export default class BarnetError extends Error {
   /**
    * @internal
    */
-  static get storeNotInitialized(): BarnetError {
-    return new BarnetError({
-      code: BarnetErrorCode.STORAGE_NOT_AVAILABLE,
+  static get storeNotInitialized(): MonchestError {
+    return new MonchestError({
+      code: MonchestErrorCode.STORAGE_NOT_AVAILABLE,
       message: 'Storage is not initialized.',
     })
   }
@@ -63,9 +63,9 @@ export default class BarnetError extends Error {
   /**
    * @internal
    */
-  static get dataEncodingFailed(): BarnetError {
-    return new BarnetError({
-      code: BarnetErrorCode.DATA_ENCODING_FAILED,
+  static get dataEncodingFailed(): MonchestError {
+    return new MonchestError({
+      code: MonchestErrorCode.DATA_ENCODING_FAILED,
       message: 'Failed to read data from Blob.',
     })
   }
@@ -73,10 +73,10 @@ export default class BarnetError extends Error {
   /**
    * @internal
    */
-  static get debuggingModeRequired(): BarnetError {
-    return new BarnetError({
-      code: BarnetErrorCode.DEBUGGING_MODE_REQUIRED,
-      message: 'Debugging mode is required. Use BarnetMemoryStorage to enable the debugging mode.',
+  static get debuggingModeRequired(): MonchestError {
+    return new MonchestError({
+      code: MonchestErrorCode.DEBUGGING_MODE_REQUIRED,
+      message: 'Debugging mode is required. Use MonchestMemoryStorage to enable the debugging mode.',
     })
   }
 }

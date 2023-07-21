@@ -1,10 +1,10 @@
-import { BarnetEncryptionPolicy, BarnetStorageData } from './storage';
-import BarnetError, { BarnetErrorCode } from './error';
-declare enum BarnetStorageType {
+import { MonchestEncryptionPolicy, MonchestStorageData } from './storage';
+import MonchestError, { MonchestErrorCode } from './error';
+declare enum MonchestStorageType {
     Memory = "memory",
     IndexedDB = "indexeddb"
 }
-interface BarnetProps {
+interface MonchestProps {
     /**
      * @description
      *  A unique store name. The same key in the same store points to the same data.
@@ -17,30 +17,30 @@ interface BarnetProps {
      */
     debugMode?: boolean;
     /**
-     * @default BarnetStorageType.Memory
+     * @default MonchestStorageType.Memory
      * @description
      *  To select a storage type.
      */
-    storage?: BarnetStorageType;
+    storage?: MonchestStorageType;
     /**
      * @description
      *  To inject the encrypt/decrypt algorithm.
-     *  If the encryption algorithm changes, Barnet would automatically detect it and clear the data before use.
+     *  If the encryption algorithm changes, Monchest would automatically detect it and clear the data before use.
      */
-    encryptionPolicy?: BarnetEncryptionPolicy;
+    encryptionPolicy?: MonchestEncryptionPolicy;
 }
 /**
  * @description
  *  Storable types.
  */
-type BarnetStorable = string | object | Blob;
-declare class Barnet {
+type MonchestStorable = string | object | Blob;
+declare class Monchest {
     readonly name: string;
     private readonly encryptionPolicy?;
     private readonly debugMode;
     private storage;
     private storageInitialized;
-    constructor(props: BarnetProps);
+    constructor(props: MonchestProps);
     private fallbackToMemoryStorage;
     private guaranteeStorageInitialized;
     /**
@@ -53,12 +53,12 @@ declare class Barnet {
      * @description
      *  It saves the data with the key into the storage.
      */
-    save(key: string, data: BarnetStorable): Promise<void>;
+    save(key: string, data: MonchestStorable): Promise<void>;
     /**
      * @description
      *  It loads the data with the key. Returns `null` if the data is not found.
      */
-    load(key: string): Promise<BarnetStorable | null>;
+    load(key: string): Promise<MonchestStorable | null>;
     /**
      * @description
      *  It deletes the data for the key. Returns `false` if the data is not found.
@@ -70,4 +70,4 @@ declare class Barnet {
      */
     clear(): Promise<void>;
 }
-export { BarnetEncryptionPolicy, BarnetError, BarnetErrorCode, Barnet, BarnetProps, BarnetStorable, BarnetStorageData, BarnetStorageType, };
+export { MonchestEncryptionPolicy, MonchestError, MonchestErrorCode, Monchest, MonchestProps, MonchestStorable, MonchestStorageData, MonchestStorageType, };

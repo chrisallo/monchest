@@ -1,16 +1,16 @@
-import BarnetStorage, { type BarnetStorageData, type BarnetStorageProps } from '.';
-export interface BarnetMemoryStorageProps extends BarnetStorageProps {
+import MonchestStorage, { type MonchestStorageData, type MonchestStorageProps } from '.';
+export interface MonchestMemoryStorageProps extends MonchestStorageProps {
     readDelay?: number;
     writeDelay?: number;
 }
-export default class BarnetMemoryStorage extends BarnetStorage {
+export default class MonchestMemoryStorage extends MonchestStorage {
     private readonly delay;
-    constructor(props: BarnetMemoryStorageProps);
+    constructor(props: MonchestMemoryStorageProps);
     get rawData(): object;
     init(): Promise<void>;
     clear(): Promise<void>;
     protected getAllRawKeys(): Promise<string[]>;
     protected getRaw(key: string): Promise<object | null>;
-    protected setRaw(items: BarnetStorageData[]): Promise<void>;
+    protected setRaw(items: MonchestStorageData[]): Promise<void>;
     protected removeRaw(keys: string[]): Promise<void>;
 }

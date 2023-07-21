@@ -1,7 +1,7 @@
 {
-  "name": "Barnet SDK Reference",
+  "name": "Monchest SDK Reference",
   "entryPoints": [
-    "src/barnet.ts",
+    "src/monchest.ts",
   ],
   "exclude": [
     "node_modules/**/*",

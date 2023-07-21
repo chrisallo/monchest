@@ -1,4 +1,4 @@
-export declare enum BarnetErrorCode {
+export declare enum MonchestErrorCode {
     /**
      * @describe The environment does not support the storage type.
      */
@@ -19,31 +19,31 @@ export declare enum BarnetErrorCode {
 /**
  * @internal
  */
-interface BarnetErrorProps {
-    code: BarnetErrorCode;
+interface MonchestErrorProps {
+    code: MonchestErrorCode;
     message: string;
 }
-export default class BarnetError extends Error {
-    readonly code: BarnetErrorCode;
+export default class MonchestError extends Error {
+    readonly code: MonchestErrorCode;
     /**
      * @private
      */
-    constructor(props: BarnetErrorProps);
+    constructor(props: MonchestErrorProps);
     /**
      * @internal
      */
-    static get storageNotAvailable(): BarnetError;
+    static get storageNotAvailable(): MonchestError;
     /**
      * @internal
      */
-    static get storeNotInitialized(): BarnetError;
+    static get storeNotInitialized(): MonchestError;
     /**
      * @internal
      */
-    static get dataEncodingFailed(): BarnetError;
+    static get dataEncodingFailed(): MonchestError;
     /**
      * @internal
      */
-    static get debuggingModeRequired(): BarnetError;
+    static get debuggingModeRequired(): MonchestError;
 }
 export {};

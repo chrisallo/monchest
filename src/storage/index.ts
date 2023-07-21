@@ -1,7 +1,7 @@
 
 import { warning } from '../utils/logger'
 
-export interface BarnetEncryptionPolicy {
+export interface MonchestEncryptionPolicy {
   /**
    * @describe
    *  The function to encrypt an object to an encrypted string.
@@ -18,16 +18,16 @@ export interface BarnetEncryptionPolicy {
 /**
  * @internal
  */
-export interface BarnetStorageProps {
+export interface MonchestStorageProps {
   name: string
   maxRawSize?: number
-  encryptionPolicy?: BarnetEncryptionPolicy
+  encryptionPolicy?: MonchestEncryptionPolicy
 }
 
 /**
  * @internal
  */
-export interface BarnetStorageData {
+export interface MonchestStorageData {
   key: string
   value: object
 }
@@ -35,12 +35,12 @@ export interface BarnetStorageData {
 /**
  * @internal
  */
-interface BarnetStorageDataShard {
+interface MonchestStorageDataShard {
   data: string
   numberOfShards?: number
 }
 
-const DEFAULT_ENCRYPTION_POLICY: BarnetEncryptionPolicy = {
+const DEFAULT_ENCRYPTION_POLICY: MonchestEncryptionPolicy = {
   encrypt: (data: object) => JSON.stringify(data),
   decrypt: (encrypted: string) => JSON.parse(encrypted),
 }
@@ -48,9 +48,9 @@ const ENCRYPTION_CHECK_DUMMY = { a: 100, n: 'stacktrace' }
 const DEFAULT_MAX_RAW_SIZE = 4096
 const MINIMUM_MAX_RAW_SIZE = 10
 
-export default abstract class BarnetStorage {
+export default abstract class MonchestStorage {
   readonly name: string
-  readonly encryptionPolicy: BarnetEncryptionPolicy
+  readonly encryptionPolicy: MonchestEncryptionPolicy
   protected readonly maxRawSize: number
 
   private get reservedKeys(): string[] {
@@ -64,7 +64,7 @@ export default abstract class BarnetStorage {
 
   protected abstract getAllRawKeys(): Promise<string[]>
   protected abstract getRaw(key: string): Promise<object | null>
-  protected abstract setRaw(data: BarnetStorageData[]): Promise<void>
+  protected abstract setRaw(data: MonchestStorageData[]): Promise<void>
   protected abstract removeRaw(keys: string[]): Promise<void>
 
   protected async resetIfEncryptionChanged(): Promise<void> {
@@ -90,7 +90,7 @@ export default abstract class BarnetStorage {
   private generateShardPostfixArray(count = 1): number[] {
     return [...Array(count).keys()]
   }
-  private shardify(item: BarnetStorageData): BarnetStorageData[] {
+  private shardify(item: MonchestStorageData): MonchestStorageData[] {
     const { key, value } = item
     const data = this.encryptionPolicy.encrypt(value)
     const numberOfshards = Math.ceil(data.length / this.maxRawSize)
@@ -98,20 +98,20 @@ export default abstract class BarnetStorage {
     return this.generateShardPostfixArray(numberOfshards)
       .map((index: number) => {
         const rawKey = this.createRawKey(key, index)
-        const shard: BarnetStorageData = {
+        const shard: MonchestStorageData = {
           key: rawKey,
           value: {
             data: data.substring(index * this.maxRawSize, (index + 1) * this.maxRawSize),
           },
         }
         if (index === 0) {
-          (shard.value as BarnetStorageDataShard).numberOfShards = numberOfshards
+          (shard.value as MonchestStorageDataShard).numberOfShards = numberOfshards
         }
         return shard
       })
   }
 
-  constructor(props: BarnetStorageProps) {
+  constructor(props: MonchestStorageProps) {
     const {
       name,
       maxRawSize,
@@ -133,14 +133,14 @@ export default abstract class BarnetStorage {
     const rawData = await this.getRaw(rawKey)
     if (rawData) {
       try {
-        const { data, numberOfShards } = rawData as BarnetStorageDataShard
+        const { data, numberOfShards } = rawData as MonchestStorageDataShard
         const shards = numberOfShards && numberOfShards > 1
           ? await Promise.all(
             this.generateShardPostfixArray(numberOfShards)
               .map(async (index: number) => {
                 if (index > 0) {
                   const rawKey = this.createRawKey(key, index)
-                  const rawData = await this.getRaw(rawKey) as BarnetStorageDataShard
+                  const rawData = await this.getRaw(rawKey) as MonchestStorageDataShard
                   return rawData?.data
                 } else return data
               }),
@@ -157,15 +157,15 @@ export default abstract class BarnetStorage {
     const shards = this.shardify({ key, value })
     await this.setRaw(shards)
   }
-  async setMany(items: BarnetStorageData[]): Promise<void> {
-    const shards: BarnetStorageData[] = items.map((item: BarnetStorageData) => this.shardify(item)).flat()
+  async setMany(items: MonchestStorageData[]): Promise<void> {
+    const shards: MonchestStorageData[] = items.map((item: MonchestStorageData) => this.shardify(item)).flat()
     await this.setRaw(shards)
   }
   async remove(key: string): Promise<boolean> {
     const rawKey = this.createRawKey(key)
     const rawData = await this.getRaw(rawKey)
     if (rawData) {
-      const { numberOfShards } = rawData as BarnetStorageDataShard
+      const { numberOfShards } = rawData as MonchestStorageDataShard
       await this.removeRaw(
         this.generateShardPostfixArray(numberOfShards)
           .map((index: number) => this.createRawKey(key, index)),
@@ -180,7 +180,7 @@ export default abstract class BarnetStorage {
       const rawKey = this.createRawKey(key)
       const rawData = await this.getRaw(rawKey)
       if (rawData) {
-        const { numberOfShards } = rawData as BarnetStorageDataShard
+        const { numberOfShards } = rawData as MonchestStorageDataShard
         rawKeys.push(...this.generateShardPostfixArray(numberOfShards)
           .map((index: number) => this.createRawKey(key, index)))
       }

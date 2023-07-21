@@ -1,14 +1,14 @@
 
-import BarnetStorage, { BarnetEncryptionPolicy, BarnetStorageData } from './storage'
-import BarnetMemoryStorage from './storage/memoryStorage'
-import BarnetIndexedDbStorage from './storage/indexedDbStorage'
-import BarnetError, { BarnetErrorCode } from './error'
+import MonchestStorage, { MonchestEncryptionPolicy, MonchestStorageData } from './storage'
+import MonchestMemoryStorage from './storage/memoryStorage'
+import MonchestIndexedDbStorage from './storage/indexedDbStorage'
+import MonchestError, { MonchestErrorCode } from './error'
 
-enum BarnetStorageType {
+enum MonchestStorageType {
   Memory = 'memory',
   IndexedDB = 'indexeddb',
 }
-interface BarnetProps {
+interface MonchestProps {
   /**
    * @description
    *  A unique store name. The same key in the same store points to the same data.
@@ -23,30 +23,30 @@ interface BarnetProps {
   debugMode?: boolean
 
   /**
-   * @default BarnetStorageType.Memory
+   * @default MonchestStorageType.Memory
    * @description
    *  To select a storage type.
    */
-  storage?: BarnetStorageType
+  storage?: MonchestStorageType
 
   /**
    * @description
    *  To inject the encrypt/decrypt algorithm.
-   *  If the encryption algorithm changes, Barnet would automatically detect it and clear the data before use.
+   *  If the encryption algorithm changes, Monchest would automatically detect it and clear the data before use.
    */
-  encryptionPolicy?: BarnetEncryptionPolicy
+  encryptionPolicy?: MonchestEncryptionPolicy
 }
 
 /**
  * @description
  *  Storable types.
  */
-type BarnetStorable = string | object | Blob
+type MonchestStorable = string | object | Blob
 
 /**
  * @internal
  */
-enum BarnetStoredDataType {
+enum MonchestStoredDataType {
   String = 'string',
   Object = 'json',
   Blob = 'binary',
@@ -56,25 +56,25 @@ enum BarnetStoredDataType {
 /**
  * @internal
  */
-interface BarnetStoredUnit {
-  type: BarnetStoredDataType
+interface MonchestStoredUnit {
+  type: MonchestStoredDataType
   data: string | object
 }
 
-class Barnet {
+class Monchest {
   readonly name: string
 
-  private readonly encryptionPolicy?: BarnetEncryptionPolicy
+  private readonly encryptionPolicy?: MonchestEncryptionPolicy
   private readonly debugMode: boolean
 
-  private storage: BarnetStorage
+  private storage: MonchestStorage
   private storageInitialized: boolean
 
-  constructor(props: BarnetProps) {
+  constructor(props: MonchestProps) {
     const {
       name,
       debugMode = false,
-      storage = BarnetStorageType.Memory,
+      storage = MonchestStorageType.Memory,
       encryptionPolicy,
     } = props
 
@@ -84,14 +84,14 @@ class Barnet {
     this.encryptionPolicy = encryptionPolicy
 
     switch (storage) {
-      case BarnetStorageType.Memory:
-        this.storage = new BarnetMemoryStorage({
+      case MonchestStorageType.Memory:
+        this.storage = new MonchestMemoryStorage({
           name,
           encryptionPolicy,
         })
         break
-      case BarnetStorageType.IndexedDB:
-        this.storage = new BarnetIndexedDbStorage({
+      case MonchestStorageType.IndexedDB:
+        this.storage = new MonchestIndexedDbStorage({
           name,
           encryptionPolicy,
         })
@@ -100,7 +100,7 @@ class Barnet {
   }
 
   private fallbackToMemoryStorage(): void {
-    this.storage = new BarnetMemoryStorage({
+    this.storage = new MonchestMemoryStorage({
       name: this.name,
       encryptionPolicy: this.encryptionPolicy,
     })
@@ -111,9 +111,9 @@ class Barnet {
         await this.storage.init()
         this.storageInitialized = true
       } catch (err) {
-        if (err instanceof BarnetError) {
+        if (err instanceof MonchestError) {
           switch (err.code) {
-            case BarnetErrorCode.STORAGE_NOT_AVAILABLE: {
+            case MonchestErrorCode.STORAGE_NOT_AVAILABLE: {
               this.fallbackToMemoryStorage()
               await this.guaranteeStorageInitialized()
               break
@@ -131,38 +131,38 @@ class Barnet {
    */
   getMemoryStoreForDebugging(): object {
     if (this.debugMode) {
-      if (this.storage instanceof BarnetMemoryStorage) {
+      if (this.storage instanceof MonchestMemoryStorage) {
         return this.storage.rawData
       }
     }
-    throw BarnetError.debuggingModeRequired
+    throw MonchestError.debuggingModeRequired
   }
 
   /**
    * @description
    *  It saves the data with the key into the storage.
    */
-  async save(key: string, data: BarnetStorable): Promise<void> {
+  async save(key: string, data: MonchestStorable): Promise<void> {
     await this.guaranteeStorageInitialized()
-    const unit: BarnetStoredUnit = {
+    const unit: MonchestStoredUnit = {
       data,
-      type: BarnetStoredDataType.Unknown
+      type: MonchestStoredDataType.Unknown
     }
     if (data instanceof Blob) {
       unit.data = {
         dataUrl: await new Promise<string>((resolve, reject) => {
           const fileReader = new FileReader()
           fileReader.onload = () => resolve(fileReader.result as string)
-          fileReader.onerror = () => reject(BarnetError.dataEncodingFailed)
+          fileReader.onerror = () => reject(MonchestError.dataEncodingFailed)
           fileReader.readAsDataURL(data)
         }),
         type: data.type,
       }
-      unit.type = BarnetStoredDataType.Blob
+      unit.type = MonchestStoredDataType.Blob
     } else if (typeof data === 'object') {
-      unit.type = BarnetStoredDataType.Object
+      unit.type = MonchestStoredDataType.Object
     } else if (typeof data === 'string') {
-      unit.type = BarnetStoredDataType.String
+      unit.type = MonchestStoredDataType.String
     }
     await this.storage?.set(key, unit)
   }
@@ -171,12 +171,12 @@ class Barnet {
    * @description
    *  It loads the data with the key. Returns `null` if the data is not found.
    */
-  async load(key: string): Promise<BarnetStorable | null> {
+  async load(key: string): Promise<MonchestStorable | null> {
     await this.guaranteeStorageInitialized()
-    const unit = await this.storage?.get(key) as BarnetStoredUnit
+    const unit = await this.storage?.get(key) as MonchestStoredUnit
     if (unit) {
       switch (unit.type) {
-        case BarnetStoredDataType.Blob: {
+        case MonchestStoredDataType.Blob: {
           const { dataUrl, type } = unit.data as { dataUrl: string, type: string }
           if (typeof fetch !== 'undefined') {
             const res = await fetch(dataUrl)
@@ -196,8 +196,8 @@ class Barnet {
             return new Blob(byteArrays, { type })
           }
         }
-        case BarnetStoredDataType.Object:
-        case BarnetStoredDataType.String:
+        case MonchestStoredDataType.Object:
+        case MonchestStoredDataType.String:
           return unit.data
       }
     }
@@ -224,12 +224,12 @@ class Barnet {
 }
 
 export {
-  BarnetEncryptionPolicy,
-  BarnetError,
-  BarnetErrorCode,
-  Barnet,
-  BarnetProps,
-  BarnetStorable,
-  BarnetStorageData,
-  BarnetStorageType,
+  MonchestEncryptionPolicy,
+  MonchestError,
+  MonchestErrorCode,
+  Monchest,
+  MonchestProps,
+  MonchestStorable,
+  MonchestStorageData,
+  MonchestStorageType,
 }

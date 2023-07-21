@@ -1,19 +1,19 @@
-import BarnetStorage, { type BarnetStorageData, type BarnetStorageProps } from '.';
-export interface BarnetIndexedDbStorageProps extends BarnetStorageProps {
+import MonchestStorage, { type MonchestStorageData, type MonchestStorageProps } from '.';
+export interface MonchestIndexedDbStorageProps extends MonchestStorageProps {
 }
-export default class BarnetIndexedDbStorage extends BarnetStorage {
+export default class MonchestIndexedDbStorage extends MonchestStorage {
     private state;
     private window?;
     private indexedDb?;
     private database?;
     private openJobQueue;
-    constructor(props: BarnetIndexedDbStorageProps);
+    constructor(props: MonchestIndexedDbStorageProps);
     private open;
     private getObjectStore;
     init(): Promise<void>;
     clear(): Promise<void>;
     protected getAllRawKeys(): Promise<string[]>;
     protected getRaw(key: string): Promise<object | null>;
-    protected setRaw(items: BarnetStorageData[]): Promise<void>;
+    protected setRaw(items: MonchestStorageData[]): Promise<void>;
     protected removeRaw(keys: string[]): Promise<void>;
 }

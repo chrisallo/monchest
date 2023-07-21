@@ -1,5 +1,5 @@
 
-import BarnetMemoryStorage from '../../../src/storage/memoryStorage'
+import MonchestMemoryStorage from '../../../src/storage/memoryStorage'
 
 describe('storage/memoryStorage', () => {
   const TEST_STORAGE_NAME = 'teststorage'
@@ -18,14 +18,14 @@ describe('storage/memoryStorage', () => {
   }
 
   afterEach(async () => {
-    const storage = new BarnetMemoryStorage({
+    const storage = new MonchestMemoryStorage({
       name: TEST_STORAGE_NAME,
     })
     await storage.clear()
   })
 
   test('new', async () => {
-    const storage = new BarnetMemoryStorage({
+    const storage = new MonchestMemoryStorage({
       name: TEST_STORAGE_NAME,
     })
     await storage.init()
@@ -34,7 +34,7 @@ describe('storage/memoryStorage', () => {
     expect(storage.rawData).toStrictEqual({})
   })
   test('getAllKeys() empty', async () => {
-    const storage = new BarnetMemoryStorage({
+    const storage = new MonchestMemoryStorage({
       name: TEST_STORAGE_NAME,
     })
     await storage.init()
@@ -43,7 +43,7 @@ describe('storage/memoryStorage', () => {
     expect(keys).toHaveLength(0)
   })
   test('get() empty', async () => {
-    const storage = new BarnetMemoryStorage({
+    const storage = new MonchestMemoryStorage({
       name: TEST_STORAGE_NAME,
     })
     await storage.init()
@@ -53,7 +53,7 @@ describe('storage/memoryStorage', () => {
     expect(value).toBeNull()
   })
   test('set() > get()', async () => {
-    const storage = new BarnetMemoryStorage({
+    const storage = new MonchestMemoryStorage({
       name: TEST_STORAGE_NAME,
     })
     await storage.init()
@@ -65,7 +65,7 @@ describe('storage/memoryStorage', () => {
     expect(value).toStrictEqual(data.value)
   })
   test('set() > get() with encryption', async () => {
-    const storage = new BarnetMemoryStorage({
+    const storage = new MonchestMemoryStorage({
       name: TEST_STORAGE_NAME,
       encryptionPolicy: {
         encrypt: (data: object) => {
@@ -86,7 +86,7 @@ describe('storage/memoryStorage', () => {
     expect(value).toStrictEqual(data.value)
   })
   test('set() multiple shards > get()', async () => {
-    const storage = new BarnetMemoryStorage({
+    const storage = new MonchestMemoryStorage({
       name: TEST_STORAGE_NAME,
       maxRawSize: 10,
     })
@@ -99,7 +99,7 @@ describe('storage/memoryStorage', () => {
     expect(value).toStrictEqual(data)
   })
   test('set() > remove() > get()', async () => {
-    const storage = new BarnetMemoryStorage({
+    const storage = new MonchestMemoryStorage({
       name: TEST_STORAGE_NAME,
     })
     await storage.init()
@@ -112,7 +112,7 @@ describe('storage/memoryStorage', () => {
     expect(value).toBeNull()
   })
   test('set() multiple shards > remove() > get()', async () => {
-    const storage = new BarnetMemoryStorage({
+    const storage = new MonchestMemoryStorage({
       name: TEST_STORAGE_NAME,
       maxRawSize: 10,
     })
@@ -126,7 +126,7 @@ describe('storage/memoryStorage', () => {
     expect(value).toBeNull()
   })
   test('setMany() > get()', async () => {
-    const storage = new BarnetMemoryStorage({
+    const storage = new MonchestMemoryStorage({
       name: TEST_STORAGE_NAME,
     })
     await storage.init()
@@ -144,7 +144,7 @@ describe('storage/memoryStorage', () => {
     expect(value3).toStrictEqual(list[2].value)
   })
   test('setMany() multiple shards > get()', async () => {
-    const storage = new BarnetMemoryStorage({
+    const storage = new MonchestMemoryStorage({
       name: TEST_STORAGE_NAME,
       maxRawSize: 10,
     })
@@ -163,7 +163,7 @@ describe('storage/memoryStorage', () => {
     expect(value3).toStrictEqual(list[2].value)
   })
   test('setMany() > remove() > get()', async () => {
-    const storage = new BarnetMemoryStorage({
+    const storage = new MonchestMemoryStorage({
       name: TEST_STORAGE_NAME,
     })
     await storage.init()
@@ -176,7 +176,7 @@ describe('storage/memoryStorage', () => {
     expect(value).toBeNull()
   })
   test('setMany() multiple shards > remove() > get()', async () => {
-    const storage = new BarnetMemoryStorage({
+    const storage = new MonchestMemoryStorage({
       name: TEST_STORAGE_NAME,
       maxRawSize: 10,
     })
@@ -190,7 +190,7 @@ describe('storage/memoryStorage', () => {
     expect(value).toBeNull()
   })
   test('setMany() > removeMany() > get()', async () => {
-    const storage = new BarnetMemoryStorage({
+    const storage = new MonchestMemoryStorage({
       name: TEST_STORAGE_NAME,
     })
     await storage.init()
@@ -209,7 +209,7 @@ describe('storage/memoryStorage', () => {
     expect(value3).toBeNull()
   })
   test('setMany() multiple shards > removeMany() > get()', async () => {
-    const storage = new BarnetMemoryStorage({
+    const storage = new MonchestMemoryStorage({
       name: TEST_STORAGE_NAME,
       maxRawSize: 10,
     })

@@ -1,6 +1,6 @@
 
-import BarnetStorage, { type BarnetStorageData, type BarnetStorageProps } from '.'
-import BarnetError from '../error'
+import MonchestStorage, { type MonchestStorageData, type MonchestStorageProps } from '.'
+import MonchestError from '../error'
 import { isBrowser, isLegacyEdgeBrowser } from '../utils/compat'
 
 interface WindowCompat extends Window {
@@ -27,20 +27,20 @@ enum IndexedDbStorageState {
   CLOSED,
 }
 
-const INDEXEDDB_OBJECTSTORE_NAME = 'Barnet'
+const INDEXEDDB_OBJECTSTORE_NAME = 'Monchest'
 const INDEXEDDB_ITEM_SIZE_LIMIT = 100 * 1024 * 1024 // 100MB
 const INDEXEDDB_REOPEN_DELAY = 10
 
-export interface BarnetIndexedDbStorageProps extends BarnetStorageProps {}
+export interface MonchestIndexedDbStorageProps extends MonchestStorageProps {}
 
-export default class BarnetIndexedDbStorage extends BarnetStorage {
+export default class MonchestIndexedDbStorage extends MonchestStorage {
   private state: IndexedDbStorageState
   private window?: WindowCompat
   private indexedDb?: IDBFactory
   private database?: IDBDatabase
   private openJobQueue: IndexedDbOpenJob[] = []
 
-  constructor(props: BarnetIndexedDbStorageProps) {
+  constructor(props: MonchestIndexedDbStorageProps) {
     super({
       ...props,
       maxRawSize: INDEXEDDB_ITEM_SIZE_LIMIT,
@@ -82,7 +82,7 @@ export default class BarnetIndexedDbStorage extends BarnetStorage {
           reject(ev.target.error)
         })
       } else {
-        reject(BarnetError.storageNotAvailable)
+        reject(MonchestError.storageNotAvailable)
       }
     })
   }
@@ -93,7 +93,7 @@ export default class BarnetIndexedDbStorage extends BarnetStorage {
       switch (this.state) {
         case IndexedDbStorageState.UNINITIALIZED:
         case IndexedDbStorageState.OPEN:
-          throw BarnetError.storeNotInitialized
+          throw MonchestError.storeNotInitialized
 
         case IndexedDbStorageState.OPENING:
         case IndexedDbStorageState.CLOSED:
@@ -110,28 +110,28 @@ export default class BarnetIndexedDbStorage extends BarnetStorage {
       if (this.window && isBrowser()) {
         if (isLegacyEdgeBrowser()) {
           if (!this.window.indexedDB && (this.window.PointerEvent || this.window.MSPointerEvent)) {
-            throw BarnetError.storageNotAvailable
+            throw MonchestError.storageNotAvailable
           }
         } else {
           await new Promise<void>((resolve, reject) => {
             if (this.indexedDb) {
               try {
                 const db = this.indexedDb.open('_testMozilla')
-                db.onerror = () => reject(BarnetError.storageNotAvailable)
+                db.onerror = () => reject(MonchestError.storageNotAvailable)
                 db.onsuccess = () => resolve()
               } catch {
-                reject(BarnetError.storageNotAvailable)
+                reject(MonchestError.storageNotAvailable)
               }
             } else {
-              reject(BarnetError.storageNotAvailable)
+              reject(MonchestError.storageNotAvailable)
             }
           })
         }
       } else {
-        throw BarnetError.storageNotAvailable
+        throw MonchestError.storageNotAvailable
       }
     } else {
-      throw BarnetError.storageNotAvailable
+      throw MonchestError.storageNotAvailable
     }
     this.database = await this.open()
     await this.resetIfEncryptionChanged()
@@ -157,16 +157,16 @@ export default class BarnetIndexedDbStorage extends BarnetStorage {
     return await new Promise((resolve, reject) => {
       const request: IDBRequest = objectStore.get(key)
       request.addEventListener('success', (ev: IDBGetRequestEvent) => {
-        const data = ev?.target?.result as BarnetStorageData
+        const data = ev?.target?.result as MonchestStorageData
         resolve(data?.value)
       })
       request.addEventListener('error', (ev: IDBGetRequestEvent) => reject(ev.target.error))
     })
   }
-  protected async setRaw(items: BarnetStorageData[]): Promise<void> {
+  protected async setRaw(items: MonchestStorageData[]): Promise<void> {
     const objectStore = await this.getObjectStore('readwrite')
     await Promise.all<void>(
-      items.map((item: BarnetStorageData) => {
+      items.map((item: MonchestStorageData) => {
         return new Promise((resolve, reject) => {
           const request: IDBRequest = objectStore.put(item)
           request.addEventListener('success', () => resolve())

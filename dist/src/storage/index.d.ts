@@ -1,4 +1,4 @@
-export interface BarnetEncryptionPolicy {
+export interface MonchestEncryptionPolicy {
     /**
      * @describe
      *  The function to encrypt an object to an encrypted string.
@@ -13,38 +13,38 @@ export interface BarnetEncryptionPolicy {
 /**
  * @internal
  */
-export interface BarnetStorageProps {
+export interface MonchestStorageProps {
     name: string;
     maxRawSize?: number;
-    encryptionPolicy?: BarnetEncryptionPolicy;
+    encryptionPolicy?: MonchestEncryptionPolicy;
 }
 /**
  * @internal
  */
-export interface BarnetStorageData {
+export interface MonchestStorageData {
     key: string;
     value: object;
 }
-export default abstract class BarnetStorage {
+export default abstract class MonchestStorage {
     readonly name: string;
-    readonly encryptionPolicy: BarnetEncryptionPolicy;
+    readonly encryptionPolicy: MonchestEncryptionPolicy;
     protected readonly maxRawSize: number;
     private get reservedKeys();
     abstract init(): Promise<void>;
     abstract clear(): Promise<void>;
     protected abstract getAllRawKeys(): Promise<string[]>;
     protected abstract getRaw(key: string): Promise<object | null>;
-    protected abstract setRaw(data: BarnetStorageData[]): Promise<void>;
+    protected abstract setRaw(data: MonchestStorageData[]): Promise<void>;
     protected abstract removeRaw(keys: string[]): Promise<void>;
     protected resetIfEncryptionChanged(): Promise<void>;
     private createRawKey;
     private generateShardPostfixArray;
     private shardify;
-    constructor(props: BarnetStorageProps);
+    constructor(props: MonchestStorageProps);
     getAllKeys(): Promise<string[]>;
     get(key: string): Promise<object | null>;
     set(key: string, value: object): Promise<void>;
-    setMany(items: BarnetStorageData[]): Promise<void>;
+    setMany(items: MonchestStorageData[]): Promise<void>;
     remove(key: string): Promise<boolean>;
     removeMany(keys: string[]): Promise<void>;
 }
