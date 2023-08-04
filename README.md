@@ -1,6 +1,8 @@
 
 # Monchest
 
+[![npm version](https://badge.fury.io/js/monchest.svg)](https://badge.fury.io/js/monchest)
+
 `Monchest` is a data store engine for web browser. It supports unlimited data store for string, object, and binary(blob) data regardless of the per-item size limit.
 
 ## Installation

@@ -11,7 +11,7 @@ const config: Config = {
   ],
   coverageProvider: "v8",
   coverageReporters: [
-    "text"
+    "text-summary"
   ],
   maxConcurrency: 3,
   moduleDirectories: [
