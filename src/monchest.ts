@@ -106,7 +106,7 @@ class Monchest {
     })
   }
   private async guaranteeStorageInitialized(): Promise<void> {
-    if (this.storageInitialized) {
+    if (!this.storageInitialized) {
       try {
         await this.storage.init()
         this.storageInitialized = true

@@ -1,6 +1,6 @@
 {
   "name": "monchest",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "main": "./dist/monchest.js",
   "types": "./dist/src/monchest.d.ts",
   "repository": "https://github.com/chrisallo/monchest.git",
