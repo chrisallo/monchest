@@ -1,6 +1,7 @@
 {
   "name": "monchest",
-  "version": "0.9.1",
+  "version": "0.9.2",
+  "type": "module",
   "main": "./dist/monchest.js",
   "types": "./dist/src/monchest.d.ts",
   "repository": "https://github.com/chrisallo/monchest.git",
@@ -9,7 +10,7 @@
   "keywords": ["storage"],
   "module": "true",
   "scripts": {
-    "lint": "eslint ./src/ --ext ts -c ./.eslintrc.js",
+    "lint": "eslint ./src/ --ext ts -c ./.eslintrc.cjs",
     "build": "yarn run lint && rm -rf ./dist && yarn run rollup -c",
     "docs": "typedoc",
     "test": "jest -c ./jest.config.ts"
